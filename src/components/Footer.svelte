@@ -33,6 +33,12 @@
 				alt="discord"
 				width=20 />
 		</a>
+		<a href="https://t.me/+6PPWrHDQdvpiN2Ux" target="_blank">
+			<img
+				src="/images/icons/telegram.svg"
+				alt="telegram"
+				width=20 />
+		</a>
 	</div>
 </div>
 

@@ -14,7 +14,7 @@
 		<a href="#timeline" class="link">Timeline</a>
 		<a href="https://docs.soupy.finance" class="link">Docs</a>
 	</div>
-	<div class="app-btn">
+	<div class="app-btn" disabled title="Coming soon">
 		Go to app	
 	</div>
 </div>
@@ -78,6 +78,11 @@
 		box-shadow: 0px 0px 3px 0.1px black; 
 		color: white;
 		cursor: pointer;
+	}
+
+	.app-btn[disabled] {
+		opacity: 0.5;
+		cursor: default;
 	}
 
 	@media (max-width: 950px) {
