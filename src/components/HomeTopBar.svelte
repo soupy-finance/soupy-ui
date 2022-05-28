@@ -1,26 +1,28 @@
 <script>
 	import {
-		Router, Route, Link, router
+		Link
 	} from "yrv";
 </script>
 
-<div class="topbar">
-	<div class="logo">
-		<Link href="/" class="link logo" />
-	</div>
+<div class="topbar home">
+	<Link href="/" class="link">
+		<div class="logo" />
+	</Link>
 	<div class="navbar">
 		<a href="#" class="link">Home</a>
 		<a href="#about" class="link">About</a>
 		<a href="#timeline" class="link">Timeline</a>
 		<a href="https://docs.soupy.finance" class="link">Docs</a>
 	</div>
-	<div class="app-btn" disabled title="Coming soon">
-		Go to app	
-	</div>
+	<Link href="/trade">
+		<div class="app-btn">
+			Go to app	
+		</div>
+	</Link>
 </div>
 
 <style>
-	:global(.link.logo) {
+	:global(.topbar.home .logo) {
 		width: 3em;
 		height: 3em;
 		background-image: url("/images/logo_no_bg.svg");
@@ -50,10 +52,6 @@
 	}
 
 	.logo {
-
-	}
-
-	.logo {
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: center;
@@ -78,11 +76,6 @@
 		box-shadow: 0px 0px 3px 0.1px black; 
 		color: white;
 		cursor: pointer;
-	}
-
-	.app-btn[disabled] {
-		opacity: 0.5;
-		cursor: default;
 	}
 
 	@media (max-width: 950px) {

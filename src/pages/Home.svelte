@@ -381,7 +381,7 @@
 		padding: 1.3em;
 		border-radius: 1em;
 
-		background-color: #10162d;
+		background-color: var(--bg-color-sec);
 	}
 
 	.price-widget .top {
@@ -490,7 +490,7 @@
 
 		border-radius: 1em;
 
-		background-color: #10162d;
+		background-color: var(--bg-color-sec);
 	}
 
 	.section.e {

@@ -10,6 +10,19 @@ export interface Asset {
 	color: string;
 }
 
+export interface Book {
+	bids: [];
+}
+
+export interface BookSide {
+	levels: BookLevel[];
+}
+
+export interface BookLevel {
+	price: number;
+	quantity: number;
+}
+
 export interface Web3 {
 	evm: EvmWeb3;
 	solana: SolanaWeb3;

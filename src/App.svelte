@@ -4,26 +4,28 @@
 	} from "yrv";
 
 	import Home from "./pages/Home.svelte";
-	// import Swap from "./pages/Swap.svelte";
-	// import Trade from "./pages/Trade.svelte";
-	// import Farm from "./pages/Farm.svelte";
+	import Trade from "./pages/Trade.svelte";
+
+	let	bgColor = "#040816";
+	let	bgColorSec = "#10162d";
+	let	bgColorThird = "#19203b";
+	let borderColor = "#19203b";
 </script>
 
-<Router>
-	<main>
-		{#if window.location.pathname == "/"}
-			<Route path="/">
-				<Home />
-			</Route>
-		{:else}
-			<!-- <Route path="/swap"><Swap /></Route>
-			<Route path="/trade"><Trade /></Route>
-			<Route path="/farm"><Farm /></Route>
-			<Route path="/build"></Route> -->
-			<Route fallback>404</Route>
-		{/if}
-	</main>
-</Router>
+<main style="
+	--bg-color: {bgColor}; 
+	--bg-color-sec: {bgColorSec}; 
+	--bg-color-third: {bgColorThird}; 
+	--border-color: {borderColor};">
+	<Router path="/" condition={() => window.location.pathname == "/"}>
+		<Home />
+	</Router>
+	<Router>
+		<Route path="/trade">
+			<Trade />
+		</Route>
+	</Router>
+</main>
 
 <style>
 	main {
