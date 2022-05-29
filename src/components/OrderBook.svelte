@@ -9,7 +9,7 @@
 	};
 </script>
 
-<div class="wrapper">
+<div class="book-wrapper">
 	<div class="title">
 		Order Book
 	</div>
@@ -62,10 +62,10 @@
 </div>
 
 <style>
-	.wrapper {
+	.book-wrapper {
 		display: flex;
 		flex-flow: column;
-		align-items: flex-start;
+		align-items: stretch;
 		justify-content: flex-start;
 
 		padding: 1em;
@@ -84,8 +84,6 @@
 		flex-flow: column;
 		align-items: stretch;
 		justify-content: flex-start;
-
-		width: 20em;
 	}
 
 	.headers {

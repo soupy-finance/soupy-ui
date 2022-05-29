@@ -48,11 +48,9 @@
 			</div>
 		</div>
 		<div class="right-wrapper">
-			<div class="input-wrapper">
-
-			</div>
+			<OrderInput />
 			<div class="order-info-wrapper">
-				<!-- Fees, balances, account leverage -->
+				<!-- Fees, balances, account leverage, deposit/withdraw button -->
 			</div>
 		</div>
 	</div>
@@ -94,6 +92,7 @@
 		align-items: stretch;
 		justify-content: flex-start;
 
+		width: 22em;
 		border-right: 1px solid var(--bg-color-third);
 	}
 
@@ -102,6 +101,8 @@
 		flex-flow: column nowrap;
 		align-items: stretch;
 		justify-content: flex-start;
+
+		width: 22em;
 	}
 
 	.market-info-wrapper {
@@ -122,7 +123,6 @@
 		flex-flow: row nowrap;
 		align-items: stretch;
 		justify-content: flex-start;
-
 	}
 
 	.history-wrapper, .trades-wrapper, .order-info-wrapper {
