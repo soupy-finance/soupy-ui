@@ -11,16 +11,15 @@ export interface Asset {
 }
 
 export interface Book {
-	bids: [];
-}
-
-export interface BookSide {
-	levels: BookLevel[];
+	bids: BookLevel[]; 
+	asks: BookLevel[]; 
+	decimals: number;
 }
 
 export interface BookLevel {
 	price: number;
 	quantity: number;
+	total: number;
 }
 
 export interface Web3 {

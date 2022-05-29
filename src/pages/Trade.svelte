@@ -42,9 +42,7 @@
 			</div>
 		</div>
 		<div class="center-wrapper">
-			<div class="books-wrapper">
-				<OrderBook />
-			</div>
+			<OrderBook />
 			<div class="trades-wrapper">
 
 			</div>
@@ -62,6 +60,8 @@
 
 <style>
 	.wrapper {
+		flex-grow: 1;
+
 		display: flex;
 		flex-flow: column nowrap;
 		align-items: stretch;
@@ -69,6 +69,8 @@
 	}
 
 	.core {
+		flex-grow: 1;
+
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: stretch;
@@ -83,7 +85,7 @@
 		align-items: stretch;
 		justify-content: flex-start;
 
-		border-right: 1px solid var(--bg-color);
+		border-right: 1px solid var(--bg-color-third);
 	}
 
 	.center-wrapper {
@@ -92,7 +94,7 @@
 		align-items: stretch;
 		justify-content: flex-start;
 
-		border-right: 1px solid var(--bg-color);
+		border-right: 1px solid var(--bg-color-third);
 	}
 
 	.right-wrapper {
@@ -107,6 +109,8 @@
 		flex-flow: row nowrap;
 		align-items: center;
 		justify-content: flex-start;
+
+		border-bottom: 1px solid var(--bg-color-third);
 	}
 
 	.market-info-wrapper div {
@@ -118,11 +122,14 @@
 		flex-flow: row nowrap;
 		align-items: stretch;
 		justify-content: flex-start;
+
 	}
 
 	.history-wrapper, .trades-wrapper, .order-info-wrapper {
 		flex-grow: 1;
 	}
 
-		
+	.history-wrapper {
+		border-top: 1px solid var(--bg-color-third);
+	}
 </style>

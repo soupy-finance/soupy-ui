@@ -9,6 +9,6 @@
 	iframe {
 		flex-grow: 1;
 
-		height: 60vh;
+		height: 68vh;
 	}
 </style>
