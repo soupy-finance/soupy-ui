@@ -13,13 +13,22 @@ export interface Asset {
 export interface Book {
 	bids: BookLevel[]; 
 	asks: BookLevel[]; 
-	decimals: number;
+	max: number;
 }
 
 export interface BookLevel {
 	price: number;
 	quantity: number;
 	total: number;
+}
+
+export type RecentTrades = RecentTrade[]; 
+
+export interface RecentTrade {
+	price: number;
+	size: number;
+	time: number;
+	sell: boolean;
 }
 
 export interface Web3 {

@@ -67,7 +67,7 @@
 		justify-content: space-between;
 
 		margin: 0.3em 0em 0em 0em;
-		border-bottom: 1px solid var(--border-color);
+		border-bottom: 2px solid var(--border-color);
 	}
 
 	.left {

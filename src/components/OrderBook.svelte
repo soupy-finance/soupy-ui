@@ -1,11 +1,64 @@
 <script lang="ts">
+	import { toPriceStr, toQtyStr, toPercentageStr } from "../number";
 	import type { Book } from "../types";
 
-	let price: number = 0;
+	let price: number = 30000;
 	let book: Book = {
-		bids: [],
-		asks: [],
-		decimals: 1,
+		bids: [
+			{
+				price: 30000,
+				quantity: 1.2,
+				total: 1.2,
+			},
+			{
+				price: 29000,
+				quantity: 3.5,
+				total: 5.7,
+			},
+			{
+				price: 28000,
+				quantity: 2.3,
+				total: 7,
+			},
+			{
+				price: 27000,
+				quantity: 0.8,
+				total: 7.8,
+			},
+			{
+				price: 26000,
+				quantity: 4.0,
+				total: 10.1,
+			},
+		],
+		asks: [
+			{
+				price: 31000,
+				quantity: 1.2,
+				total: 1.2,
+			},
+			{
+				price: 32000,
+				quantity: 3.5,
+				total: 4.7,
+			},
+			{
+				price: 33000,
+				quantity: 2.3,
+				total: 7.0,
+			},
+			{
+				price: 34000,
+				quantity: 6.0,
+				total: 13.0,
+			},
+			{
+				price: 35000,
+				quantity: 4.4,
+				total: 17.4,
+			},
+		],
+		max: 17.4,
 	};
 </script>
 
@@ -26,35 +79,37 @@
 			</div>
 		</div>
 		<div class="book-side asks">
-			{#each book.bids as level}
-				<div class="level">
-					<div class="price">
-						{level.price}	
-					</div>	
-					<div class="amount">
-						{level.quantity}	
-					</div>	
-					<div class="total">
-						{level.total}	
-					</div>	
-				</div>
-			{/each}
-		</div>
-		<div class="price">
-			{price}
-		</div>
-		<div class="book-side bids">
 			{#each book.asks as level}
 				<div class="level">
 					<div class="price">
-						{level.price}	
+						{toPriceStr(level.price)}	
 					</div>	
 					<div class="amount">
-						{level.quantity}	
+						{toQtyStr(level.quantity)}	
 					</div>	
 					<div class="total">
-						{level.total}	
+						{toQtyStr(level.total)}	
 					</div>	
+					<div class="depth-bar" style="width: {level.total / book.max * 70}%" />
+				</div>
+			{/each}
+		</div>
+		<div class="last-price bid">
+			{price}
+		</div>
+		<div class="book-side bids">
+			{#each book.bids as level}
+				<div class="level">
+					<div class="price">
+						{toPriceStr(level.price)}	
+					</div>	
+					<div class="amount">
+						{toQtyStr(level.quantity)}	
+					</div>	
+					<div class="total">
+						{toQtyStr(level.total)}	
+					</div>	
+					<div class="depth-bar" style="width: {level.total / book.max * 70}%" />
 				</div>
 			{/each}
 		</div>
@@ -69,7 +124,7 @@
 		justify-content: flex-start;
 
 		padding: 1em;
-		border-bottom: 1px solid var(--bg-color-third);
+		border-bottom: 2px solid var(--bg-color-third);
 	}
 
 	.title {
@@ -91,6 +146,10 @@
 		flex-flow: row nowrap;
 		align-items: center;
 		justify-content: space-between;
+
+		margin-bottom: 0.5em;
+
+		opacity: 0.6;
 	}
 
 	.book-side {
@@ -100,14 +159,58 @@
 		justify-content: flex-start;
 	}
 
+	.book-side.asks {
+		flex-direction: column-reverse;
+	}
+
+	.last-price {
+		margin: 1em 0em;
+
+		font-size: 1.05em;
+		font-weight: 700;
+	}
+
 	.level {
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: center;
 		justify-content: space-between;
+
+		position: relative;
 	}
 
 	.price {
-		margin: 1em 0em;
+		font-weight: 600;
+	}
+
+	.total {
+		width: 2.7em;
+
+		direction: rtl;
+	}
+
+	.asks .price, .last-price.ask {
+		color: #eb5757;
+	}
+
+	.bids .price, .last-price.bid {
+		color: #27ae60;
+	}
+
+	.depth-bar {
+		position: absolute;
+		right: 0em;
+		height: 100%;
+		z-index: -1;
+
+		opacity: 0.2;
+	}
+
+	.asks .depth-bar {
+		background-color: #eb5757;
+	}
+
+	.bids .depth-bar {
+		background-color: #27ae60;
 	}
 </style>
