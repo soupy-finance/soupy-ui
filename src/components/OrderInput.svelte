@@ -1,10 +1,10 @@
 
 <div class="inputs-wrapper">
 	<div class="type-tabs">
-		<div class="type">
+		<div class="tab sel">
 			Limit
 		</div>
-		<div class="type">
+		<div class="tab">
 			Market
 		</div>
 	</div>
@@ -36,7 +36,7 @@
 	</div>
 	<div class="total input-wrapper">
 		<div class="label">
-			Total	
+			Value	
 		</div>
 		<input type="text" maxlength="15" disabled />
 		<div class="denom">
@@ -89,13 +89,21 @@
 		height: 3em;
 	}
 
-	.type-tabs .type {
+	.type-tabs .tab {
 		flex-grow: 1;
 
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: center;
 		justify-content: center;
+
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.type-tabs .tab.sel {
+		border-top: var(--border-thickness) solid var(--theme-color);
+		background: linear-gradient(180deg, rgba(229,0,0,0.3) 0%, rgba(0,0,0,0) 28%);
 	}
 
 	.side-tabs {

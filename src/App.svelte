@@ -6,6 +6,7 @@
 	import Home from "./pages/Home.svelte";
 	import Trade from "./pages/Trade.svelte";
 
+	let themeColor = "#e53700";
 	let	bgColor = "#040816";
 	let	bgColorSec = "#10162d";
 	let	bgColorThird = "#19203b";
@@ -13,6 +14,7 @@
 </script>
 
 <main style="
+	--theme-color: {themeColor};
 	--bg-color: {bgColor}; 
 	--bg-color-sec: {bgColorSec}; 
 	--bg-color-third: {bgColorThird}; 

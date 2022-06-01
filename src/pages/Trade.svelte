@@ -7,6 +7,7 @@
 	import { toPriceStr, toQtyStr, toPercentageStr } from "../number";
 	import type { RecentTrades } from "../types";
 
+	let borderThickness: string = "3px";
 	let tickerPrice: number = 30000;
 	let tickerChange: number = 0;
 	let tickerHigh: number = 0;
@@ -47,7 +48,7 @@
 	]; 
 </script>
 
-<div class="wrapper">
+<div class="wrapper" style="--border-thickness: {borderThickness};">
 	<TopBar />
 	<div class="core">
 		<div class="left-wrapper">
@@ -84,8 +85,57 @@
 			<div class="chart-wrapper">
 				<Chart />
 			</div>
-			<div class="history-wrapper">
-
+			<div class="orders-wrapper">
+				<div class="type-tabs">
+					<div class="tab sel">
+						Open Orders
+					</div>
+					<div class="tab">
+						Order History	
+					</div>
+				</div>
+				<div class="headers">
+					<div class="header">
+						Market	
+					</div>
+					<div class="header">
+						Price	
+					</div>
+					<div class="header">
+						Amount
+					</div>
+					<div class="header">
+						Filled	
+					</div>
+					<div class="header">
+						Value	
+					</div>
+					<div class="header">
+						Date	
+					</div>
+				</div>
+				<div class="rows">
+					<div class="row">
+						<div class="col">
+							BTC/USDC
+						</div>
+						<div class="col">
+							3000 USDC
+						</div>
+						<div class="col">
+							1 BTC
+						</div>
+						<div class="col">
+							0 BTC
+						</div>
+						<div class="col">
+							3000 USDC
+						</div>
+						<div class="col">
+							{(new Date(Date.now())).toLocaleString()}
+						</div>
+					</div>	
+				</div>
 			</div>
 		</div>
 		<div class="center-wrapper">
@@ -126,6 +176,60 @@
 			<OrderInput />
 			<div class="order-info-wrapper">
 				<!-- Fees, balances, account leverage, deposit/withdraw button -->
+				<div class="info-section">
+					<div class="title">
+						Fees
+					</div>
+					<div class="info-rows">
+						<div class="info-row">
+							<div class="header">
+								Maker
+							</div>
+							<div>
+								0.02%
+							</div>
+						</div>
+						<div class="info-row">
+							<div class="header">
+								Taker	
+							</div>
+							<div>
+								0.05%
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="info-section">
+					<div class="title">
+						Assets	
+					</div>
+					<div class="info-rows">
+						<div class="info-row">
+							<div class="header">
+								USDC	
+							</div>
+							<div>
+								1000	
+							</div>
+						</div>
+						<div class="info-row">
+							<div class="header">
+								BTC	
+							</div>
+							<div>
+								2.4	
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="balance-btns">
+					<div class="balance-btn">
+						⭳ Deposit
+					</div>
+					<div class="balance-btn">
+						⭱ Withdraw 
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -158,7 +262,7 @@
 		align-items: stretch;
 		justify-content: flex-start;
 
-		border-right: 2px solid var(--bg-color-third);
+		border-right: var(--border-thickness) solid var(--bg-color-third);
 	}
 
 	.center-wrapper {
@@ -168,7 +272,7 @@
 		justify-content: flex-start;
 
 		width: 22em;
-		border-right: 2px solid var(--bg-color-third);
+		border-right: var(--border-thickness) solid var(--bg-color-third);
 	}
 
 	.right-wrapper {
@@ -186,7 +290,7 @@
 		align-items: center;
 		justify-content: flex-start;
 
-		border-bottom: 2px solid var(--bg-color-third);
+		border-bottom: var(--border-thickness) solid var(--bg-color-third);
 	}
 
 	.chart-wrapper {
@@ -196,12 +300,74 @@
 		justify-content: flex-start;
 	}
 
-	.history-wrapper, .recent-trades-wrapper, .order-info-wrapper {
+	.orders-wrapper, .recent-trades-wrapper, .order-info-wrapper {
 		flex-grow: 1;
 	}
 
-	.history-wrapper {
-		border-top: 2px solid var(--bg-color-third);
+	.orders-wrapper {
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+		
+		border-top: var(--border-thickness) solid var(--bg-color-third);
+	}
+
+	.orders-wrapper .type-tabs {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+	}
+
+	.orders-wrapper .tab {
+		padding: 1em;
+		
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.orders-wrapper .tab.sel {
+		border-top: var(--border-thickness) solid var(--theme-color);
+		background: linear-gradient(180deg, rgba(229,0,0,0.3) 0%, rgba(0,0,0,0) 28%);
+	}
+
+	.orders-wrapper .headers {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: flex-start;
+
+		margin-left: 1em;
+
+		opacity: 0.6;
+	}
+
+	.orders-wrapper .header {
+		width: 8em;
+	}
+
+	.orders-wrapper .rows {
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+	}
+
+	.orders-wrapper .row {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+
+		margin-left: 1em;
+	}
+
+	.orders-wrapper .col {
+		width: 8em;
+		margin-top: 0.2em;
+
+		white-space: nowrap;
 	}
 
 	.market-info {
@@ -240,7 +406,6 @@
 	.recent-trades-wrapper .title {
 		margin: 0em 0em 1em 0em;
 
-		font-size: 1.1em;
 		font-weight: 600;
 	}
 
@@ -289,7 +454,63 @@
 	}
 
 	.order-info-wrapper {
-		margin-top: 4em;
-		border-top: 2px solid var(--bg-color-third);
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+		
+		margin-top: 3em;
+		padding: 1em;
+		border-top: var(--border-thickness) solid var(--bg-color-third);
+	}
+
+	.order-info-wrapper .info-section {
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+	}
+
+	.order-info-wrapper .title {
+		margin-bottom: 0.5em;
+
+		font-weight: 600;
+	}
+
+	.order-info-wrapper .info-rows {
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+
+		margin-bottom: 1em;
+	}
+
+	.order-info-wrapper .info-row {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: space-between;
+
+		margin-bottom: 0.2em;
+	}
+
+	.order-info-wrapper .header {
+		opacity: 0.6;
+	}
+
+	.order-info-wrapper .balance-btns {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: stretch;
+		justify-content: space-evenly;
+	}
+
+	.order-info-wrapper .balance-btn {
+		padding: 0.5em;
+		border-radius: 0.5em;
+
+		background-color: var(--bg-color-third);
+		cursor: pointer;
 	}
 </style>

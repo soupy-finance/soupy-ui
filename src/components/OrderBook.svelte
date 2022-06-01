@@ -124,13 +124,12 @@
 		justify-content: flex-start;
 
 		padding: 1em;
-		border-bottom: 2px solid var(--bg-color-third);
+		border-bottom: var(--border-thickness) solid var(--bg-color-third);
 	}
 
 	.title {
 		margin: 0em 0em 1em 0em;
 
-		font-size: 1.1em;
 		font-weight: 600;
 	}
 
