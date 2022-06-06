@@ -5,12 +5,16 @@
 
 	import Home from "./pages/Home.svelte";
 	import Trade from "./pages/Trade.svelte";
+	import { noodleClient } from "./stores";
 
 	let themeColor = "#e53700";
 	let	bgColor = "#040816";
 	let	bgColorSec = "#10162d";
 	let	bgColorThird = "#19203b";
 	let borderColor = "#19203b";
+
+	noodleClient.setRestAddr(import.meta.env.NOODLE_REST_ADDR);
+	noodleClient.setRpcAddr(import.meta.env.NOODLE_RPC_ADDR);
 </script>
 
 <main style="

@@ -1,7 +1,11 @@
-<script>
+<script lang="ts">
 	import {
 		Link
 	} from "yrv";
+	import Modal from "./Modal.svelte";
+	import { noodleClient } from "../stores";
+
+	let showModal: boolean = false;
 </script>
 
 <div class="topbar app">
@@ -24,9 +28,12 @@
 			</Link>
 		</div>
 	</div>
-	<div class="wallet-btn">
+	<div class="wallet-btn" on:click={() => showModal = !showModal}>
 		Connect wallet	
 	</div>
+	<Modal show={showModal}>
+		test
+	</Modal>
 </div>
 
 <style>

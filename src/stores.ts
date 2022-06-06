@@ -1,5 +1,10 @@
 import { writable, Writable } from "svelte/store";
-import type { Asset, Web3 } from "./types";
+import type { Asset, NoodleClient, NoodleClientStore, Web3 } from "./types";
+import type { OfflineSigner } from "@cosmjs/proto-signing";
+
+import { txClient as bridgeTxClient, queryClient as bridgeQueryClient } from "noodle-ts-client/dist/modules/soupy-finance/noodle/soupyfinance.noodle.bridge/module";
+import { txClient as dexTxClient, queryClient as dexQueryClient } from "noodle-ts-client/dist/modules/soupy-finance/noodle/soupyfinance.noodle.dex/module";
+import { txClient as oracleTxClient, queryClient as oracleQueryClient } from "noodle-ts-client/dist/modules/soupy-finance/noodle/soupyfinance.noodle.oracle/module";
 
 export const assets: Writable<{[key: string]: Asset}> = writable({
 	"usdc": {
@@ -9,14 +14,6 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 		balance: 0,
 		cmcId: 3408,
 		color: "#2775ca"
-	},
-	"ust": {
-		name: "Terra USD",
-		symbol: "UST",
-		price: 1,
-		balance: 0,
-		cmcId: 7129,
-		color: "#5493f7"
 	},
 	"usdt": {
 		name: "Tether",
@@ -99,6 +96,86 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 		color: "#8247e5"
 	},
 });
+
+export const noodleClient = (() => {
+	const { subscribe, set, update }: Writable<NoodleClient> = writable({
+		restAddr: null,
+		rpcAddr: null,
+		wallet: null,
+		modules: {
+			bridge: {
+				tx: null,
+				query: null,
+				txGen: bridgeTxClient,
+				queryGen: bridgeQueryClient,
+			},
+			dex: {
+				tx: null,
+				query: null,
+				txGen: dexTxClient,
+				queryGen: dexQueryClient,
+			},
+			oracle: {
+				tx: null,
+				query: null,
+				txGen: oracleTxClient,
+				queryGen: oracleQueryClient,
+			},
+		},
+	});
+
+	return {
+		subscribe,
+		setRestAddr: async (restAddr: string) => {
+			let client: NoodleClient
+			update((_client: NoodleClient) => client = _client);
+
+			client.restAddr = restAddr;
+
+			for (let moduleName in client.modules) {
+				let module = client.modules[moduleName];
+				module.query = await module.queryGen({ addr: restAddr });
+			}
+
+			set(client);
+		},
+		setRpcAddr: async (rpcAddr: string) => {
+			let client: NoodleClient
+			update((_client: NoodleClient) => client = _client);
+
+			client.rpcAddr = rpcAddr;
+
+			if (!client.wallet) {
+				for (let moduleName in client.modules) {
+					let module = client.modules[moduleName];
+					module.query = await module.queryGen({ addr: rpcAddr });
+
+					if (client.wallet)
+						module.tx = await module.txGen(client.wallet, { addr: rpcAddr });
+				}
+			}
+
+			set(client);
+		},
+		setWallet: async (wallet: OfflineSigner) => {
+			let client: NoodleClient
+			update((_client: NoodleClient) => client = _client);
+
+			if (!client.rpcAddr)
+				return;
+
+			client.wallet = wallet;
+
+			for (let moduleName in client.modules) {
+				let module = client.modules[moduleName];
+				module.tx = await module.txGen(wallet, { addr: client.rpcAddr });
+			}
+
+			set(client);
+		},
+	};
+})(); 
+
 export const web3: Writable<Web3> = writable({
 	evm : {},
 	solana: {},

@@ -1,3 +1,4 @@
+import type { OfflineSigner } from "@cosmjs/proto-signing";
 import type { PublicKey } from "@solana/web3.js";
 import type { Adapter, WalletReadyState } from "@solana/wallet-adapter-base";
 
@@ -29,6 +30,30 @@ export interface RecentTrade {
 	size: number;
 	time: number;
 	sell: boolean;
+}
+
+export interface NoodleClientStore {
+	subscribe: Function,
+	setNodeAddr: Function,
+	setWallet: Function,
+}
+
+export interface NoodleClient {
+	restAddr: string,
+	rpcAddr: string,
+	wallet: OfflineSigner,
+	modules: {
+		bridge: ModuleClient,
+		dex: ModuleClient,
+		oracle: ModuleClient,
+	},
+}
+
+export interface ModuleClient {
+	tx: any,
+	query: any,
+	txGen: Function,
+	queryGen: Function,
 }
 
 export interface Web3 {
