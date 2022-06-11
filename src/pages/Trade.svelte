@@ -1,85 +1,96 @@
 <script lang="ts">
+	import axios from "axios";
+	import { noodleClient } from "../noodle";
+	import { toPriceStr, toQtyStr, toPercentageStr } from "../number";
+	import { parseBooksFromChainData, Books } from "../orderBook";
+	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory, Account } from "../markets";
+
 	import TopBar from "../components/AppTopBar.svelte";
 	import Chart from "../components/Chart.svelte";
 	import MarketSelector from "../components/MarketSelector.svelte";
 	import OrderBook from "../components/OrderBook.svelte";
 	import OrderInput from "../components/OrderInput.svelte";
-	import { toPriceStr, toQtyStr, toPercentageStr } from "../number";
-	import type { RecentTrades } from "../types";
 
+	export let marketKey: string 
+	export let markets: Markets; 
+	let marketPair: string;
+	let marketInfo: Market;
 	let borderThickness: string = "3px";
-	let tickerPrice: number = 30000;
-	let tickerChange: number = 0;
-	let tickerHigh: number = 0;
-	let tickerLow: number = 0;
-	let tickerVol: number = 0;
+	let recentTrades: RecentTrades = [];
+	let openOrders: OpenOrders = []; 
+	let orderHistory: OrderHistory = [];
+	let books: Books;
+	let account: Account;
 
-	let recentTrades: RecentTrades = [
-		{ 
-			price: 30000,
-			size: 0.8,
-			time: Date.now(),
-			sell: false,
-		},
-		{ 
-			price: 30000,
-			size: 0.9,
-			time: Date.now(),
-			sell: true,
-		},
-		{ 
-			price: 30000,
-			size: 1.2,
-			time: Date.now(),
-			sell: true,
-		},
-		{ 
-			price: 30000,
-			size: 0.01,
-			time: Date.now(),
-			sell: true,
-		},
-		{ 
-			price: 30000,
-			size: 0.01,
-			time: Date.now(),
-			sell: false,
-		},
-	]; 
+	$: marketPair = marketKey.split("-").join("/").toUpperCase();
+	$: marketInfo = markets[marketKey];
+	$: mainAsset = marketKey.split("-")[0].toUpperCase();
+	$: quoteAsset = marketKey.split("-")[1].toUpperCase();
+	$: {
+		if (account) {
+			(async () => {
+				let data: {open: OpenOrders, history: OrderHistory} = 
+					await axios.get(`${import.meta.env.VITE_API_REST_ADDR}/accountOrders/${account}`);
+				openOrders = data.open;
+				orderHistory = data.history;
+			})();
+		}
+	}
+
+	async function loadData() {
+		let res: any[] = await Promise.all([
+			$noodleClient.modules.dex.query.queryBooks(marketKey),
+			// axios.get(`${import.meta.env.VITE_API_REST_ADDR}/recentTrades/${marketKey}`),
+		]);
+
+		books = parseBooksFromChainData(res[0].data);
+		// recentTrades = res[1];
+	}
 </script>
+
+<svelte:head>
+	<title>
+		Trade | Soupy
+	</title>
+</svelte:head>
 
 <div class="wrapper" style="--border-thickness: {borderThickness};">
 	<TopBar />
+	<!-- svelte-ignore empty-block -->
+	{#await loadData()}
+	{:then}
 	<div class="core">
 		<div class="left-wrapper">
 			<div class="market-info-wrapper">
-				<MarketSelector />
+				<MarketSelector 
+					marketPair={marketPair}
+					markets={markets} />
 				<div class="market-info ticker-price">
-					{toPriceStr(tickerPrice)} USDC
+					{toPriceStr(marketInfo.price)} {quoteAsset} 
 				</div>
 				<div class="market-info ticker-change">
 					<div class="label">
-						Change:
+						24h Change:
 					</div>
-					{toPercentageStr(tickerChange)}%
+					{toPercentageStr(marketInfo.change)}%
 				</div>	
 				<div class="market-info ticker-high">
 					<div class="label">
 						24h High:
 					</div>
-					{toPriceStr(tickerHigh)}
+					{toPriceStr(marketInfo.high) + " " + quoteAsset}
 				</div>
 				<div class="market-info ticker-low">
 					<div class="label">
 						24h Low:
 					</div>
-					{toPriceStr(tickerLow)}
+					{toPriceStr(marketInfo.low) + " " + quoteAsset}
 				</div>
 				<div class="market-info ticker-vol">
 					<div class="label">
 						24h Volume:
 					</div>
-					{toQtyStr(tickerVol)} 
+					{toQtyStr(marketInfo.volume) + " " + mainAsset} 
 				</div>
 			</div>
 			<div class="chart-wrapper">
@@ -115,41 +126,47 @@
 					</div>
 				</div>
 				<div class="rows">
-					<div class="row">
-						<div class="col">
-							BTC/USDC
-						</div>
-						<div class="col">
-							3000 USDC
-						</div>
-						<div class="col">
-							1 BTC
-						</div>
-						<div class="col">
-							0 BTC
-						</div>
-						<div class="col">
-							3000 USDC
-						</div>
-						<div class="col">
-							{(new Date(Date.now())).toLocaleString()}
-						</div>
-					</div>	
+					{#each openOrders as order}
+						<div class="row">
+							<div class="col">
+								{order.market}	
+							</div>
+							<div class="col">
+								{toPriceStr(order.price)} {order.quoteAsset} 
+							</div>
+							<div class="col">
+								{toQtyStr(order.quantity)} {mainAsset} 
+							</div>
+							<div class="col">
+								{toQtyStr(order.filled)} {mainAsset} 
+							</div>
+							<div class="col">
+								{toQtyStr(order.price * order.quantity)} {quoteAsset} 
+							</div>
+							<div class="col">
+								{(new Date(Date.now())).toLocaleString()}
+							</div>
+						</div>	
+					{/each}
 				</div>
 			</div>
 		</div>
 		<div class="center-wrapper">
-			<OrderBook />
+			<OrderBook
+				price={marketInfo.price}
+				books={books}
+				mainAsset={mainAsset}
+				quoteAsset={quoteAsset} />
 			<div class="recent-trades-wrapper">
 				<div class="title">
 					Recent Trades
 				</div>
 				<div class="headers">
 					<div class="header price">
-						Price
+						Price ({quoteAsset})
 					</div>
 					<div class="header size">
-						Size	
+						Size ({mainAsset})	
 					</div>
 					<div class="header time">
 						Time	
@@ -206,7 +223,7 @@
 					<div class="info-rows">
 						<div class="info-row">
 							<div class="header">
-								USDC	
+								{quoteAsset}	
 							</div>
 							<div>
 								1000	
@@ -214,7 +231,7 @@
 						</div>
 						<div class="info-row">
 							<div class="header">
-								BTC	
+								{mainAsset}	
 							</div>
 							<div>
 								2.4	
@@ -233,6 +250,7 @@
 			</div>
 		</div>
 	</div>
+	{/await}
 </div>
 
 <style>
@@ -418,6 +436,13 @@
 		margin-bottom: 0.5em;
 
 		opacity: 0.6;
+	}
+
+	.recent-trades-wrapper .headers .time {
+		width: 5em;
+
+		direction: rtl;
+		white-space: nowrap;
 	}
 	
 	.recent-trades {

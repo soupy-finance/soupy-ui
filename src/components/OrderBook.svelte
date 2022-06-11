@@ -1,65 +1,11 @@
 <script lang="ts">
 	import { toPriceStr, toQtyStr, toPercentageStr } from "../number";
-	import type { Book } from "../types";
+	import type { Books } from "../orderBook";
 
-	let price: number = 30000;
-	let book: Book = {
-		bids: [
-			{
-				price: 30000,
-				quantity: 1.2,
-				total: 1.2,
-			},
-			{
-				price: 29000,
-				quantity: 3.5,
-				total: 5.7,
-			},
-			{
-				price: 28000,
-				quantity: 2.3,
-				total: 7,
-			},
-			{
-				price: 27000,
-				quantity: 0.8,
-				total: 7.8,
-			},
-			{
-				price: 26000,
-				quantity: 4.0,
-				total: 10.1,
-			},
-		],
-		asks: [
-			{
-				price: 31000,
-				quantity: 1.2,
-				total: 1.2,
-			},
-			{
-				price: 32000,
-				quantity: 3.5,
-				total: 4.7,
-			},
-			{
-				price: 33000,
-				quantity: 2.3,
-				total: 7.0,
-			},
-			{
-				price: 34000,
-				quantity: 6.0,
-				total: 13.0,
-			},
-			{
-				price: 35000,
-				quantity: 4.4,
-				total: 17.4,
-			},
-		],
-		max: 17.4,
-	};
+	export let price: number = 0;
+	export let mainAsset: string = "";
+	export let quoteAsset: string = "";
+	export let books: Books;
 </script>
 
 <div class="book-wrapper">
@@ -69,17 +15,17 @@
 	<div class="book">
 		<div class="headers">
 			<div class="header">
-				Price
+				Price ({quoteAsset})
 			</div>
 			<div class="header">
-				Amount	
+				Amount ({mainAsset})	
 			</div>
 			<div class="header">
-				Total	
+				Total ({mainAsset})	
 			</div>
 		</div>
 		<div class="book-side asks">
-			{#each book.asks as level}
+			{#each books.asks as level}
 				<div class="level">
 					<div class="price">
 						{toPriceStr(level.price)}	
@@ -90,15 +36,15 @@
 					<div class="total">
 						{toQtyStr(level.total)}	
 					</div>	
-					<div class="depth-bar" style="width: {level.total / book.max * 70}%" />
+					<div class="depth-bar" style="width: {level.total / books.max * 70}%" />
 				</div>
 			{/each}
 		</div>
-		<div class="last-price bid">
-			{price}
+		<div class="last-price">
+			{toPriceStr(price)}
 		</div>
 		<div class="book-side bids">
-			{#each book.bids as level}
+			{#each books.bids as level}
 				<div class="level">
 					<div class="price">
 						{toPriceStr(level.price)}	
@@ -109,7 +55,7 @@
 					<div class="total">
 						{toQtyStr(level.total)}	
 					</div>	
-					<div class="depth-bar" style="width: {level.total / book.max * 70}%" />
+					<div class="depth-bar" style="width: {level.total / books.max * 70}%" />
 				</div>
 			{/each}
 		</div>

@@ -1,11 +1,9 @@
 <script>
-	import {
-		Link
-	} from "yrv";
+	import { Link } from "svelte-navigator";
 </script>
 
 <div class="topbar home">
-	<Link href="/" class="link">
+	<Link to="/" class="link">
 		<div class="logo" />
 	</Link>
 	<div class="navbar">
@@ -14,7 +12,7 @@
 		<a href="#timeline" class="link">Timeline</a>
 		<a href="https://docs.soupy.finance" class="link">Docs</a>
 	</div>
-	<Link href="/trade">
+	<Link to="/trade">
 		<div class="app-btn">
 			Go to app	
 		</div>

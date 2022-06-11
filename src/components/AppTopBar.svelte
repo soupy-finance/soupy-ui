@@ -2,28 +2,38 @@
 	import {
 		Link
 	} from "yrv";
-	import Modal from "./Modal.svelte";
-	import { noodleClient } from "../stores";
+	import { useLocation } from "svelte-navigator";
 
+	import Modal from "./Modal.svelte";
+	import { noodleClient } from "../noodle";
+
+	const location = useLocation();
 	let showModal: boolean = false;
+
+	function getLinkClass(path) {
+		if ($location.pathname.indexOf(path) != -1)
+			return "active";
+		else
+			return "";
+	}
 </script>
 
 <div class="topbar app">
 	<div class="left">
-		<Link href="/" class="link">
+		<Link href="/">
 			<div class="logo" />
 		</Link>
 		<div class="navbar">
-			<Link href="/swap">
+			<Link href="/swap" class="{getLinkClass("/swap")}">
 				Swap	
 			</Link>
-			<Link href="/trade">
+			<Link href="/trade" class="{getLinkClass("/trade")}">
 				Trade
 			</Link>
-			<Link href="/farm">
+			<Link href="/farm" class="{getLinkClass("/farm")}">
 				Farm	
 			</Link>
-			<Link href="/borrow">
+			<Link href="/borrow" class="{getLinkClass("/borrow")}">
 				Borrow	
 			</Link>
 		</div>
@@ -37,7 +47,7 @@
 </div>
 
 <style>
-	:global(.topbar.app .logo) {
+	.topbar.app :global(.logo) {
 		display: block;
 		width: 2.5em;
 		height: 2.5em;
@@ -47,24 +57,17 @@
 		background-size: contain;
 	}
 
-	:global(.topbar.app .navbar a) {
-		margin: 0em 0.6em;
+	.topbar.app .navbar :global(a) {
+		margin: 0em 0.1em;
+		padding: 0.3em 0.7em;
 	}
 
-	:global(.topbar.app .navbar a[aria-current]) {
-		display: flex;
-		flex-flow: row nowrap;
-		align-items: center;
-		justify-content: flex-start;
-
-		padding: 0.3em 0.7em;
+	.topbar.app .navbar :global(a.active) {
 		border-radius: 0.5em;
 
 		background: rgb(229,0,0);
 		background: linear-gradient(90deg, rgba(229,0,0,1) 0%, rgba(229,110,0,1) 100%);	
 		box-shadow: 0px 0px 3px 0.1px black; 
-		color: white;
-		cursor: pointer;
 	}
 
 	.topbar {

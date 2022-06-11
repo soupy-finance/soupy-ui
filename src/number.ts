@@ -16,17 +16,17 @@ export function toFixed(num: number, decimals: number, method: string = "round")
 	}
 }
 
-export function toPriceStr(num: number): string {
+export function toPriceStr(num: number=0): string {
 	return num.toPrecision(PRICE_STR_PRECISION);	
 }
 
-export function toQtyStr(num: number): string {
+export function toQtyStr(num: number=0): string {
 	if (num > 10**(QTY_STR_PRECISION_INT))
 		return num.toPrecision(QTY_STR_PRECISION_INT);	
 	else 
 		return parseFloat(num.toPrecision(QTY_STR_PRECISION_DEC)).toString();
 }
 
-export function toPercentageStr(num: number): string {
+export function toPercentageStr(num: number=0): string {
 	return num.toPrecision(PERCENTAGE_STR_PRECISION);
 }

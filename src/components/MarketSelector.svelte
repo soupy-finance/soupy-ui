@@ -1,18 +1,46 @@
 <script lang="ts">
+	import type { Market, Markets } from "../markets";
+
+	export let marketPair: string;
+	export let markets: Markets; 
+	let marketPairs: string[]
 	let showDropdown: boolean = false
-	let marketName: string = "BTC/USDC"
+
+	$: marketPairs = Object.keys(markets);
 </script>
 
 <div class="market-sel-wrapper">
 	<div class="market-name">
-		{marketName} 
+		{marketPair} 
 	</div>
 	<div class="drop-arrow">
 		▼
 	</div>
 	{#if showDropdown}
 		<div class="dropdown">
+			<div class="search-wrapper">
 
+			</div>
+			<div class="buttons-wrapper">
+			</div>
+			<div class="headers">
+				<div class="header">
+					Market
+				</div>
+				<div class="header">
+					Price
+				</div>
+				<div class="header">
+					24h Change	
+				</div>
+			</div>
+			<div class="markets-wrapper">
+				{#each marketPairs as _marketPair}
+					<div class="market">
+
+					</div>
+				{/each}
+			</div>
 		</div>
 	{/if}
 </div>

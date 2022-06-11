@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {
-		Router, Route, Link, router
-	} from "yrv";
+	import axios from "axios";
+	import { Router, Route } from "svelte-navigator";
+	import { noodleClient } from "./noodle";
+	import type { Markets } from "./markets";
 
 	import Home from "./pages/Home.svelte";
 	import Trade from "./pages/Trade.svelte";
-	import { noodleClient } from "./stores";
 
 	let themeColor = "#e53700";
 	let	bgColor = "#040816";
@@ -13,8 +13,26 @@
 	let	bgColorThird = "#19203b";
 	let borderColor = "#19203b";
 
-	noodleClient.setRestAddr(import.meta.env.NOODLE_REST_ADDR);
-	noodleClient.setRpcAddr(import.meta.env.NOODLE_RPC_ADDR);
+	let markets: Markets; 
+
+	async function loadData() {
+		await noodleClient.setRestAddr(import.meta.env.VITE_NOODLE_REST_ADDR);
+		await noodleClient.setRpcAddr(import.meta.env.VITE_NOODLE_RPC_ADDR);
+
+		let res: any = await $noodleClient.modules.dex.query.queryParams();
+		markets = JSON.parse(res.data.params.markets);
+
+		// let apiMarketData: Markets = await axios.get(`${import.meta.env.VITE_API_REST_ADDR}/markets`);
+
+		// for (let marketKey in apiMarketData) {
+		// 	if (markets[marketKey]) {
+		// 		markets[marketKey] = {
+		// 			...markets[marketKey],
+		// 			...apiMarketData[marketKey],
+		// 		};
+		// 	}
+		// }
+	}
 </script>
 
 <main style="
@@ -23,12 +41,31 @@
 	--bg-color-sec: {bgColorSec}; 
 	--bg-color-third: {bgColorThird}; 
 	--border-color: {borderColor};">
-	<Router path="/" condition={() => window.location.pathname == "/"}>
-		<Home />
-	</Router>
 	<Router>
-		<Route path="/trade">
-			<Trade />
+		<Route path="/" component={Home} />
+		<Route path="/trade/*">
+			<!-- svelte-ignore empty-block -->
+			{#await loadData()}
+			{:then}
+			<Route path=":market" let:params let:navigate>
+				{#if markets[params.market.toLowerCase()]}
+					<Trade 
+						marketKey={params.market.toLowerCase()}
+						markets={markets} />
+				{:else}
+					{navigate("/trade")}	
+				{/if}
+			</Route>
+			<Route path="/" let:navigate>
+				{navigate(import.meta.env.VITE_DEFAULT_MARKET)}	
+			</Route>
+			<Route path="/*" let:navigate>
+				{navigate("/trade")}	
+			</Route>
+			{/await}
+		</Route>
+		<Route path="/*" let:navigate>
+			{navigate("/")}	
 		</Route>
 	</Router>
 </main>
