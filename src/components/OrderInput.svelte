@@ -1,3 +1,6 @@
+<script lang="ts">
+	import { account } from "../account";
+</script>
 
 <div class="inputs-wrapper">
 	<div class="type-tabs">
@@ -63,7 +66,9 @@
 			</div>
 		</div>
 	</div>
-	<div class="trade-btn theme-btn">
+	<div 
+		class="trade-btn theme-btn"
+		disabled={!$account.wallet}>
 		Trade
 	</div>
 </div>
@@ -206,5 +211,10 @@
 		padding: 0.8em 5em;
 
 		border-radius: 0.5em;
+	}
+
+	.trade-btn[disabled=true] {
+		opacity: 0.6;
+		cursor: default;
 	}
 </style>

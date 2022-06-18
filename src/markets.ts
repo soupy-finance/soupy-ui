@@ -52,5 +52,3 @@ export interface PastOrder {
 	result: string;
 	date: number;
 }
-
-export type Account = string;

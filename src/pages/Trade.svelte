@@ -1,9 +1,10 @@
 <script lang="ts">
 	import axios from "axios";
-	import { noodleClient } from "../noodle";
-	import { toPriceStr, toQtyStr, toPercentageStr } from "../number";
-	import { parseBooksFromChainData, Books } from "../orderBook";
-	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory, Account } from "../markets";
+	import noodleClient from "noodle-ts-client/dist";
+	import { toPriceStr, toQtyStr, toPercentageStr, parseAssetInt } from "../number";
+	import { parseBooksFromChainData, processBookUpdateQueue, Books, BookUpdate } from "../orderBook";
+	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory } from "../markets";
+	import { account } from "../account";
 
 	import TopBar from "../components/AppTopBar.svelte";
 	import Chart from "../components/Chart.svelte";
@@ -15,37 +16,58 @@
 	export let markets: Markets; 
 	let marketPair: string;
 	let marketInfo: Market;
-	let borderThickness: string = "3px";
+	let books: Books;
 	let recentTrades: RecentTrades = [];
 	let openOrders: OpenOrders = []; 
 	let orderHistory: OrderHistory = [];
-	let books: Books;
-	let account: Account;
+	let mainAssetBalance: number = 0;
+	let quoteAssetBalance: number = 0;
+	let booksBlockHeight: number = 0;
+	let bookUpdateQueue: BookUpdate[] = []; 
+
+	let borderThickness: string = "3px";
 
 	$: marketPair = marketKey.split("-").join("/").toUpperCase();
 	$: marketInfo = markets[marketKey];
 	$: mainAsset = marketKey.split("-")[0].toUpperCase();
 	$: quoteAsset = marketKey.split("-")[1].toUpperCase();
 	$: {
-		if (account) {
+		if ($account.address) {
 			(async () => {
-				let data: {open: OpenOrders, history: OrderHistory} = 
-					await axios.get(`${import.meta.env.VITE_API_REST_ADDR}/accountOrders/${account}`);
-				openOrders = data.open;
-				orderHistory = data.history;
+				let res: any[] = await Promise.all([
+					noodleClient.query.getBalance($account.address, mainAsset.toLowerCase()),
+					noodleClient.query.getBalance($account.address, quoteAsset.toLowerCase()),
+					// $noodleClient.modules.dex.query.queryOpenOrders($account.address),	
+					//axios.get(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`),
+				]);
+
+				mainAssetBalance = parseAssetInt(res[0].data.balance.amount);
+				quoteAssetBalance = parseAssetInt(res[1].data.balance.amount);
+				// openOrders = res[2]; 
+				// orderHistory = res[3];
 			})();
 		}
 	}
 
 	async function loadData() {
 		let res: any[] = await Promise.all([
-			$noodleClient.modules.dex.query.queryBooks(marketKey),
+			noodleClient.query.getBooks(marketKey),
 			// axios.get(`${import.meta.env.VITE_API_REST_ADDR}/recentTrades/${marketKey}`),
 		]);
 
 		books = parseBooksFromChainData(res[0].data);
+		booksBlockHeight = parseInt(res[0].headers.get(""));
+		books = processBookUpdateQueue(books, bookUpdateQueue, booksBlockHeight);
+
 		// recentTrades = res[1];
 	}
+
+	noodleClient.handleEvents(
+		`tm.event='Tx' AND add_offer.market EXISTS AND add_offer.market='${marketKey}'`, 
+		(res) => {
+
+		}
+	);
 </script>
 
 <svelte:head>
@@ -203,7 +225,7 @@
 								Maker
 							</div>
 							<div>
-								0.02%
+								{toPercentageStr(marketInfo.fees.maker)}%
 							</div>
 						</div>
 						<div class="info-row">
@@ -211,11 +233,12 @@
 								Taker	
 							</div>
 							<div>
-								0.05%
+								{toPercentageStr(marketInfo.fees.taker)}%
 							</div>
 						</div>
 					</div>
 				</div>
+				{#if $account.address}
 				<div class="info-section">
 					<div class="title">
 						Assets	
@@ -226,7 +249,7 @@
 								{quoteAsset}	
 							</div>
 							<div>
-								1000	
+								{quoteAssetBalance}	
 							</div>
 						</div>
 						<div class="info-row">
@@ -234,7 +257,7 @@
 								{mainAsset}	
 							</div>
 							<div>
-								2.4	
+								{mainAssetBalance}
 							</div>
 						</div>
 					</div>
@@ -247,6 +270,7 @@
 						⭱ Withdraw 
 					</div>
 				</div>
+				{/if}
 			</div>
 		</div>
 	</div>

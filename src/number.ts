@@ -2,6 +2,7 @@ export const PRICE_STR_PRECISION = 5;
 export const QTY_STR_PRECISION_INT = 5;
 export const QTY_STR_PRECISION_DEC = 5;
 export const PERCENTAGE_STR_PRECISION = 3;
+export const ASSET_INT_DECIMALS = 18;
 
 export function toFixed(num: number, decimals: number, method: string = "round"): string {
 	switch (method) {
@@ -29,4 +30,8 @@ export function toQtyStr(num: number=0): string {
 
 export function toPercentageStr(num: number=0): string {
 	return num.toPrecision(PERCENTAGE_STR_PRECISION);
+}
+
+export function parseAssetInt(num: number=0): number {
+	return num / 10**ASSET_INT_DECIMALS;
 }
