@@ -1,8 +1,16 @@
 <script lang="ts">
 	import axios from "axios";
-	import noodleClient from "noodle-ts-client/dist";
+	import * as noodleClient from "noodle-ts-client/dist";
+	import { 
+		parseBooksFromChainData, 
+		processBookUpdateQueue, 
+		addBookOrder, 
+		updateBookOrder, 
+		removeBookOrder, 
+		Books, 
+		BookUpdate 
+	} from "../orderBook";
 	import { toPriceStr, toQtyStr, toPercentageStr, parseAssetInt } from "../number";
-	import { parseBooksFromChainData, processBookUpdateQueue, Books, BookUpdate } from "../orderBook";
 	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory } from "../markets";
 	import { account } from "../account";
 
@@ -23,7 +31,7 @@
 	let mainAssetBalance: number = 0;
 	let quoteAssetBalance: number = 0;
 	let booksBlockHeight: number = 0;
-	let bookUpdateQueue: BookUpdate[] = []; 
+	let booksUpdateQueue: BookUpdate[] = []; 
 
 	let borderThickness: string = "3px";
 
@@ -37,7 +45,7 @@
 				let res: any[] = await Promise.all([
 					noodleClient.query.getBalance($account.address, mainAsset.toLowerCase()),
 					noodleClient.query.getBalance($account.address, quoteAsset.toLowerCase()),
-					// $noodleClient.modules.dex.query.queryOpenOrders($account.address),	
+					// noodleClient.modules.dex.query.queryOpenOrders($account.address),	
 					//axios.get(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`),
 				]);
 
@@ -56,16 +64,73 @@
 		]);
 
 		books = parseBooksFromChainData(res[0].data);
-		booksBlockHeight = parseInt(res[0].headers.get(""));
-		books = processBookUpdateQueue(books, bookUpdateQueue, booksBlockHeight);
+		booksBlockHeight = parseInt(res[0].headers.get("Grpc-Metadata-X-Cosmos-Block-Height"));
+		books = processBookUpdateQueue(books, booksUpdateQueue, booksBlockHeight);
 
 		// recentTrades = res[1];
 	}
 
-	noodleClient.handleEvents(
+	noodleClient.events.addEventsListener(
 		`tm.event='Tx' AND add_offer.market EXISTS AND add_offer.market='${marketKey}'`, 
-		(res) => {
+		(events, data) => {
+			let blockHeight = parseInt(data.value.TxResult.height);
 
+			for (let order of events.add_offer) {
+				order = {
+					blockHeight,
+					type: "add",
+					id: order.id,
+					quantity: parseFloat(order.quantity),
+					price: parseFloat(order.price),
+					side: order.side == "a",
+				};
+
+				if (booksBlockHeight == 0)
+					booksUpdateQueue.push(order);
+				else
+					books = addBookOrder(books, order.id, order.price, order.quantity, order.side);
+			}
+		}
+	);
+
+	noodleClient.events.addEventsListener(
+		`tm.event='Tx' AND update_offer.market EXISTS AND update_offer.market='${marketKey}'`, 
+		(events, data) => {
+			let blockHeight = parseInt(data.value.TxResult.height);
+
+			for (let order of events.update_offer) {
+				order = {
+					blockHeight,
+					type: "update",
+					id: order.id,
+					quantity: parseFloat(order.quantity),
+				};
+
+				if (booksBlockHeight == 0)
+					booksUpdateQueue.push(order);
+				else
+					books = updateBookOrder(books, order.id, order.quantity);
+			}
+		}
+	);
+
+	noodleClient.events.addEventsListener(
+		`tm.event='Tx' AND remove_offer.market EXISTS AND remove_offer.market='${marketKey}'`, 
+		(events, data) => {
+			let blockHeight = parseInt(data.value.TxResult.height);
+
+			for (let order of events.remove_offer) {
+				order = {
+					blockHeight,
+					type: "remove",
+					id: order.id,
+				};
+
+				if (booksBlockHeight == 0)
+					booksUpdateQueue.push(order);
+				else
+					books = removeBookOrder(books, order.id);
+			}
 		}
 	);
 </script>

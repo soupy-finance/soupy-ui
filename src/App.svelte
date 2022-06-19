@@ -1,7 +1,7 @@
 <script lang="ts">
 	import axios from "axios";
 	import { Router, Route } from "svelte-navigator";
-	import noodleClient from "noodle-ts-client/dist";
+	import * as noodleClient from "noodle-ts-client/dist";
 	import type { Markets } from "./markets";
 
 	import Home from "./pages/Home.svelte";
@@ -18,7 +18,7 @@
 	async function loadData() {
 		await noodleClient.setRestAddr(import.meta.env.VITE_NOODLE_REST_ADDR);
 		await noodleClient.setRpcAddr(import.meta.env.VITE_NOODLE_RPC_ADDR);
-		await noodleClient.setEventsAddr(import.meta.env.VITE_NOODLE_EVENTS_ADDR);
+		await noodleClient.events.setWsAddr(import.meta.env.VITE_NOODLE_EVENTS_ADDR);
 
 		let res: any = await noodleClient.query.getDexParams();
 		markets = JSON.parse(res.data.params.markets);
