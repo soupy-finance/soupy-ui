@@ -41,18 +41,20 @@ export function parseBooksFromChainData(data: { bids: string, asks: string }): B
 	};
 
 	for (let level of bids) {
+		let price: number = parseFloat(level.Price);
 		let quantity: number = 0;
 		let uiLevel: BookLevel = {
-			price: level.price,
+			price,
 			quantity: 0,
 			total: 0,
 		};
 
-		for (let order of level.orders) {
-			quantity += parseFloat(order.quantity);
+		for (let order of level.Orders) {
+			let orderQuantity = parseFloat(order.Quantity);
+			quantity += orderQuantity;
 			books.orders[order.id] = {
-				price: order.price,
-				quantity: order.quantity,
+				price,
+				quantity: orderQuantity,
 				level: uiLevel,
 				side: false,
 			};
@@ -65,18 +67,20 @@ export function parseBooksFromChainData(data: { bids: string, asks: string }): B
 	}
 
 	for (let level of asks) {
+		let price: number = parseFloat(level.Price);
 		let quantity: number = 0;
 		let uiLevel: BookLevel = {
-			price: level.price,
+			price,
 			quantity: 0,
 			total: 0,
 		};
 
-		for (let order of level.orders) {
-			quantity += parseFloat(order.quantity);
+		for (let order of level.Orders) {
+			let orderQuantity = parseFloat(order.Quantity);
+			quantity += orderQuantity;
 			books.orders[order.id] = {
-				price: order.price,
-				quantity: order.quantity,
+				price,
+				quantity: orderQuantity,
 				level: uiLevel,
 				side: true,
 			};
@@ -85,20 +89,16 @@ export function parseBooksFromChainData(data: { bids: string, asks: string }): B
 		asksTotal += quantity;
 		uiLevel.quantity = quantity;
 		uiLevel.total = asksTotal;
-		books.asks.push({
-			price: level.price,
-			quantity: quantity,
-			total: asksTotal,
-		});
+		books.asks.push(uiLevel);
 	}
 
 	let maxBidsTotal, maxAsksTotal: number = 0;
 
 	if (books.bids.length > 0)
-		maxBidsTotal = books[bids.length - 1].total
+		maxBidsTotal = books.bids[bids.length - 1].total
 
 	if (books.asks.length > 0)
-		maxAsksTotal = books[asks.length - 1].total
+		maxAsksTotal = books.asks[asks.length - 1].total
 
 	books.max = Math.max(maxBidsTotal, maxAsksTotal);
 	return books;

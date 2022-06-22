@@ -277,7 +277,11 @@
 			</div>
 		</div>
 		<div class="right-wrapper">
-			<OrderInput />
+			<OrderInput
+				marketKey={marketKey}
+				marketInfo={marketInfo}
+				mainAsset={mainAsset}
+				quoteAsset={quoteAsset} />
 			<div class="order-info-wrapper">
 				<!-- Fees, balances, account leverage, deposit/withdraw button -->
 				<div class="info-section">

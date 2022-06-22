@@ -1,21 +1,59 @@
 <script lang="ts">
+	import * as noodleClient from "noodle-ts-client/dist";
 	import { account } from "../account";
+	import type { Market } from "../markets";
+
+	export let marketKey: string;
+	export let marketInfo: Market;
+	export let mainAsset: string;
+	export let quoteAsset: string;
+	let price: number = 0; 
+	let quantity: number = 0; 
+	let orderValue: number = 0;
+	let side: boolean = false;
+	let orderType: noodleClient.types.OrderType = noodleClient.types.OrderType.Limit;
+
+	$: {
+		orderValue = price * quantity;
+
+		if (isNaN(orderValue))
+			orderValue = 0;
+	}
+	$: {
+		if (price < 0)
+			price = 0;
+
+		if (quantity < 0)
+			quantity = 0;
+	}
+
+	function sendOrder() {
+		noodleClient.tx.createOrder(marketKey, price, quantity, side, orderType);
+	}
 </script>
 
 <div class="inputs-wrapper">
 	<div class="type-tabs">
-		<div class="tab sel">
+		<div 
+			class="tab {orderType == noodleClient.types.OrderType.Limit && "sel"}"
+			on:click={() => orderType = noodleClient.types.OrderType.Limit}>
 			Limit
 		</div>
-		<div class="tab">
+		<div 
+			class="tab {orderType == noodleClient.types.OrderType.Market && "sel"}"
+			on:click={() => orderType = noodleClient.types.OrderType.Market}>
 			Market
 		</div>
 	</div>
 	<div class="side-tabs">
-		<div class="side sel">
+		<div 
+			class="side {!side && "sel"}"
+			on:click={() => side = false}>
 			Buy
 		</div>
-		<div class="side">
+		<div 
+			class="side {side && "sel"}"
+			on:click={() => side = true}>
 			Sell	
 		</div>
 	</div>
@@ -23,7 +61,10 @@
 		<div class="label">
 			Price
 		</div>
-		<input type="text" maxlength="15" />
+		<input 
+			type="text" 
+			maxlength="15"
+			bind:value={price} />
 		<div class="denom">
 			USDC
 		</div>
@@ -32,7 +73,10 @@
 		<div class="label">
 			Amount	
 		</div>
-		<input type="text" maxlength="15" />
+		<input 
+			type="text" 
+			maxlength="15"
+			bind:value={quantity} />
 		<div class="denom">
 			BTC
 		</div>
@@ -41,7 +85,11 @@
 		<div class="label">
 			Value	
 		</div>
-		<input type="text" maxlength="15" disabled />
+		<input 
+			type="text" 
+			maxlength="15" 
+			bind:value={orderValue}
+			disabled />
 		<div class="denom">
 			USDC	
 		</div>
@@ -68,6 +116,7 @@
 	</div>
 	<div 
 		class="trade-btn theme-btn"
+		on:click={() => $account.wallet && sendOrder()}
 		disabled={!$account.wallet}>
 		Trade
 	</div>

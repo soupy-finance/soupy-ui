@@ -1,5 +1,6 @@
 import { writable, Writable } from "svelte/store";
 import { DirectSecp256k1HdWallet, AccountData } from "@cosmjs/proto-signing";
+import * as noodleClient from "noodle-ts-client/dist";
 
 interface Account {
 	address?: string;
@@ -20,6 +21,7 @@ export async function loadFromMnemonic(mnemonic: string, pw: string) {
 	let accountDatas: readonly AccountData[] = await account.wallet.getAccounts();
 	account.address = accountDatas[0].address;
 	account.pubkey = accountDatas[0].pubkey;
+
 	set(account);
 	storeSerialized();
 }
@@ -39,6 +41,8 @@ export async function loadSerialized(pw: string) {
 	let accountDatas: readonly AccountData[] = await account.wallet.getAccounts();
 	account.address = accountDatas[0].address;
 	account.pubkey = accountDatas[0].pubkey;
+	await noodleClient.tx.setWallet(account.wallet);
+
 	set(account);
 }
 
