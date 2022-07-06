@@ -71,7 +71,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 		symbol: "LUNA",
 		price: 90,
 		balance: 0,
-		cmcId: 4172,
+		cmcId: 20314,
 		color: "#172852"
 	},
 	"bnb": {

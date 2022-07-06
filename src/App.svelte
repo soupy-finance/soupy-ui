@@ -6,6 +6,7 @@
 
 	import Home from "./pages/Home.svelte";
 	import Trade from "./pages/Trade.svelte";
+	import Notification from "./components/Notification.svelte";
 
 	let themeColor = "#e53700";
 	let	bgColor = "#040816";
@@ -69,6 +70,7 @@
 			{navigate("/")}	
 		</Route>
 	</Router>
+	<Notification />
 </main>
 
 <style>

@@ -5,7 +5,7 @@
 	import { useLocation } from "svelte-navigator";
 
 	import Modal from "./Modal.svelte";
-	import { account } from "../account";
+	import { account, shortenAddr } from "../account";
 
 	const location = useLocation();
 	let showModal: boolean = false;
@@ -21,10 +21,9 @@
 		if ($account.address)
 			return;
 		else if (window.localStorage.getItem("account"))
-			await account.loadSerialized("");
+			await account.loadSerialized();
 		else {
-			let mnemonic: string = "noodle soup noodle soup noodle soup noodle soup noodle soup noodle soup";
-			await account.loadFromMnemonic(mnemonic, "");
+			await account.generate();
 		}
 	}
 </script>
@@ -49,9 +48,15 @@
 			</Link>
 		</div>
 	</div>
-	<div class="wallet-btn" on:click={testLogin}>
-		{$account.address || "Connect wallet"}	
+	{#if $account.address}
+	<div class="wallet-btn">
+		{shortenAddr($account.address)}	
 	</div>
+	{:else}
+	<div class="wallet-btn" on:click={testLogin}>
+		Connect wallet	
+	</div>
+	{/if}
 	<Modal show={showModal}>
 	</Modal>
 </div>

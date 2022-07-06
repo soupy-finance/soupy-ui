@@ -37,6 +37,7 @@ export interface OpenOrder {
 	price: number;
 	quantity: number;
 	filled: number;
+	side: boolean;
 	date: number;
 }
 
@@ -49,6 +50,7 @@ export interface PastOrder {
 	price: number;
 	quantity: number;
 	filled: number;
+	side: boolean;
 	result: string;
 	date: number;
 }

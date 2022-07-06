@@ -45,13 +45,37 @@
 				let res: any[] = await Promise.all([
 					noodleClient.query.getBalance($account.address, mainAsset.toLowerCase()),
 					noodleClient.query.getBalance($account.address, quoteAsset.toLowerCase()),
-					// noodleClient.modules.dex.query.queryOpenOrders($account.address),	
-					//axios.get(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`),
 				]);
 
 				mainAssetBalance = parseAssetInt(res[0].data.balance.amount);
 				quoteAssetBalance = parseAssetInt(res[1].data.balance.amount);
-				// openOrders = res[2]; 
+			})();
+		}
+	}
+	$: {
+		if ($account.address) {
+			(async () => {
+				let res: any[] = await Promise.all([
+					noodleClient.modules.dex.query.queryOpenOrders($account.address),	
+					//axios.get(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`),
+				]);
+				let openOrdersJson = JSON.parse(res[2] || "{}");
+
+				for (let orderId in openOrdersJson) {
+					let order = openOrdersJson[orderId];
+
+					openOrders.push({
+						market: order.Market,
+						price: order.Price,
+						quantity: order.Quantity,
+						filled: order.Filled,
+						side: order.Side == "a",
+						date: order.Date,
+						mainAsset: order.Market.split("-")[0].toUpperCase(),
+						quoteAsset: order.Market.split("-")[1].toUpperCase(),
+					});
+				}
+
 				// orderHistory = res[3];
 			})();
 		}

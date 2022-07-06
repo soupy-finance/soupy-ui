@@ -11,11 +11,11 @@ interface Account {
 
 const { subscribe, set, update }: Writable<Account> = writable({});
 
-export async function loadFromMnemonic(mnemonic: string, pw: string) {
+async function generate(pw: string="") {
 	let account: Account;
 	update(_account => account = _account);
 
-	account.wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, import.meta.env.VITE_NOODLE_PREFIX);
+	account.wallet = await DirectSecp256k1HdWallet.generate(24, { prefix: import.meta.env.VITE_NOODLE_PREFIX });
 	account.pw = pw;
 
 	let accountDatas: readonly AccountData[] = await account.wallet.getAccounts();
@@ -26,7 +26,22 @@ export async function loadFromMnemonic(mnemonic: string, pw: string) {
 	storeSerialized();
 }
 
-export async function loadSerialized(pw: string) {
+async function loadFromMnemonic(mnemonic: string, pw: string="") {
+	let account: Account;
+	update(_account => account = _account);
+
+	account.wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: import.meta.env.VITE_NOODLE_PREFIX });
+	account.pw = pw;
+
+	let accountDatas: readonly AccountData[] = await account.wallet.getAccounts();
+	account.address = accountDatas[0].address;
+	account.pubkey = accountDatas[0].pubkey;
+
+	set(account);
+	storeSerialized();
+}
+
+async function loadSerialized(pw: string="") {
 	let account: Account;
 	update(_account => account = _account);
 	
@@ -46,7 +61,7 @@ export async function loadSerialized(pw: string) {
 	set(account);
 }
 
-export async function storeSerialized() {
+async function storeSerialized() {
 	let account: Account;
 	update(_account => account = _account);
 	
@@ -54,10 +69,14 @@ export async function storeSerialized() {
 	window.localStorage.setItem("account", walletStr);
 }
 
-
 export const account = {
 	subscribe,
+	generate,
 	loadFromMnemonic,
 	loadSerialized,
 	storeSerialized,
 };
+
+export function shortenAddr(addr: string) {
+	return addr.slice(0, 9) + "..." + addr.slice(addr.length - 4);
+}
