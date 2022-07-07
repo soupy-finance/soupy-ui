@@ -85,7 +85,7 @@
 						</div>
 						<div class="change">
 							<div class="percent">
-								1.0%
+								0.0%
 							</div>
 							<div class="time">
 								last 24h

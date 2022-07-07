@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from "svelte";
 	import axios from "axios";
 	import * as noodleClient from "noodle-ts-client/dist";
 	import { 
@@ -13,6 +14,7 @@
 	import { toPriceStr, toQtyStr, toPercentageStr, parseAssetInt } from "../number";
 	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory } from "../markets";
 	import { account } from "../account";
+	import { assets } from "../assets";
 
 	import TopBar from "../components/AppTopBar.svelte";
 	import Chart from "../components/Chart.svelte";
@@ -28,10 +30,12 @@
 	let recentTrades: RecentTrades = [];
 	let openOrders: OpenOrders = []; 
 	let orderHistory: OrderHistory = [];
+	let mainAssetPrice: number = 0;
 	let mainAssetBalance: number = 0;
 	let quoteAssetBalance: number = 0;
 	let booksBlockHeight: number = 0;
 	let booksUpdateQueue: BookUpdate[] = []; 
+	let eventsHandlersIds: number[] = [];
 
 	let borderThickness: string = "3px";
 
@@ -39,6 +43,7 @@
 	$: marketInfo = markets[marketKey];
 	$: mainAsset = marketKey.split("-")[0].toUpperCase();
 	$: quoteAsset = marketKey.split("-")[1].toUpperCase();
+	$: mainAssetPrice = mainAsset ? $assets[mainAsset.toLowerCase()].price : 0;
 	$: {
 		if ($account.address) {
 			(async () => {
@@ -94,7 +99,7 @@
 		// recentTrades = res[1];
 	}
 
-	noodleClient.events.addEventsListener(
+	eventsHandlersIds.push(noodleClient.events.addEventsListener(
 		`tm.event='Tx' AND add_offer.market EXISTS AND add_offer.market='${marketKey}'`, 
 		(events, data) => {
 			let blockHeight = parseInt(data.value.TxResult.height);
@@ -115,9 +120,9 @@
 					books = addBookOrder(books, order.id, order.price, order.quantity, order.side);
 			}
 		}
-	);
+	));
 
-	noodleClient.events.addEventsListener(
+	eventsHandlersIds.push(noodleClient.events.addEventsListener(
 		`tm.event='Tx' AND update_offer.market EXISTS AND update_offer.market='${marketKey}'`, 
 		(events, data) => {
 			let blockHeight = parseInt(data.value.TxResult.height);
@@ -136,9 +141,9 @@
 					books = updateBookOrder(books, order.id, order.quantity);
 			}
 		}
-	);
+	));
 
-	noodleClient.events.addEventsListener(
+	eventsHandlersIds.push(noodleClient.events.addEventsListener(
 		`tm.event='Tx' AND remove_offer.market EXISTS AND remove_offer.market='${marketKey}'`, 
 		(events, data) => {
 			let blockHeight = parseInt(data.value.TxResult.height);
@@ -156,7 +161,12 @@
 					books = removeBookOrder(books, order.id);
 			}
 		}
-	);
+	));
+
+	onDestroy(() => {
+		for (let id of eventsHandlersIds)
+			noodleClient.events.removeEventsListener(id);
+	});
 </script>
 
 <svelte:head>
@@ -177,7 +187,7 @@
 					marketPair={marketPair}
 					markets={markets} />
 				<div class="market-info ticker-price">
-					{toPriceStr(marketInfo.price)} {quoteAsset} 
+					{toPriceStr(mainAssetPrice)} {quoteAsset} 
 				</div>
 				<div class="market-info ticker-change">
 					<div class="label">

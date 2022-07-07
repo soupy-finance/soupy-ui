@@ -2,6 +2,7 @@
 	import axios from "axios";
 	import { Router, Route } from "svelte-navigator";
 	import * as noodleClient from "noodle-ts-client/dist";
+	import { assets } from "./assets";
 	import type { Markets } from "./markets";
 
 	import Home from "./pages/Home.svelte";
@@ -19,7 +20,7 @@
 	async function loadData() {
 		await noodleClient.setRestAddr(import.meta.env.VITE_NOODLE_REST_ADDR);
 		await noodleClient.setRpcAddr(import.meta.env.VITE_NOODLE_RPC_ADDR);
-		await noodleClient.events.setWsAddr(import.meta.env.VITE_NOODLE_EVENTS_ADDR);
+		await noodleClient.setWsAddr(import.meta.env.VITE_NOODLE_EVENTS_ADDR);
 
 		let res: any = await noodleClient.query.getDexParams();
 		markets = JSON.parse(res.data.params.markets);
@@ -34,6 +35,28 @@
 		// 		};
 		// 	}
 		// }
+
+		noodleClient.events.addEventsListener(
+			`tm.event='NewBlock' AND prices.data EXISTS`, 
+			(events, data) => {
+				let prices = JSON.parse(events.prices[0].data);
+
+				// assets.update((assets) => {
+				// 	for (let assetKey in prices) {
+				// 		if (assets[assetKey]) {
+				// 			assets[assetKey].price = prices[assetKey];
+				// 		}
+				// 	}
+				// 	return assets;
+				// });
+
+				for (let assetKey in prices) {
+					if ($assets[assetKey]) {
+						$assets[assetKey].price = parseFloat(prices[assetKey]);
+					}
+				}
+			}
+		);
 	}
 </script>
 
@@ -44,11 +67,11 @@
 	--bg-color-third: {bgColorThird}; 
 	--border-color: {borderColor};">
 	<Router>
+		<!-- svelte-ignore empty-block -->
+		{#await loadData()}
+		{:then}
 		<Route path="/" component={Home} />
 		<Route path="/trade/*">
-			<!-- svelte-ignore empty-block -->
-			{#await loadData()}
-			{:then}
 			<Route path=":market" let:params let:navigate>
 				{#if markets[params.market.toLowerCase()]}
 					<Trade 
@@ -64,11 +87,11 @@
 			<Route path="/*" let:navigate>
 				{navigate("/trade")}	
 			</Route>
-			{/await}
 		</Route>
 		<Route path="/*" let:navigate>
 			{navigate("/")}	
 		</Route>
+		{/await}
 	</Router>
 	<Notification />
 </main>
