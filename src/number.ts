@@ -35,3 +35,9 @@ export function toPercentageStr(num: number=0): string {
 export function parseAssetInt(num: number=0): number {
 	return num / 10**ASSET_INT_DECIMALS;
 }
+
+export function parseCoinStr(coin: string): [number, string] {
+	let quantity = parseAssetInt(parseInt(coin.replace(/[^0-9.]/g, "")));
+	let denom = coin.replace(/[0-9.]/g, "");
+	return [quantity, denom];
+}

@@ -15,6 +15,7 @@
 	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory } from "../markets";
 	import { account } from "../account";
 	import { assets } from "../assets";
+	import { balances } from "../balances";
 
 	import TopBar from "../components/AppTopBar.svelte";
 	import Chart from "../components/Chart.svelte";
@@ -44,19 +45,21 @@
 	$: mainAsset = marketKey.split("-")[0].toUpperCase();
 	$: quoteAsset = marketKey.split("-")[1].toUpperCase();
 	$: mainAssetPrice = mainAsset ? $assets[mainAsset.toLowerCase()].price : 0;
-	$: {
-		if ($account.address) {
-			(async () => {
-				let res: any[] = await Promise.all([
-					noodleClient.query.getBalance($account.address, mainAsset.toLowerCase()),
-					noodleClient.query.getBalance($account.address, quoteAsset.toLowerCase()),
-				]);
+	$: mainAssetBalance = mainAsset ? ($balances[mainAsset.toLowerCase()] || 0) : 0;
+	$: quoteAssetBalance = quoteAsset ? ($balances[quoteAsset.toLowerCase()] || 0) : 0;
+	// $: {
+	// 	if ($account.address) {
+	// 		(async () => {
+	// 			let res: any[] = await Promise.all([
+	// 				noodleClient.query.getBalance($account.address, mainAsset.toLowerCase()),
+	// 				noodleClient.query.getBalance($account.address, quoteAsset.toLowerCase()),
+	// 			]);
 
-				mainAssetBalance = parseAssetInt(res[0].data.balance.amount);
-				quoteAssetBalance = parseAssetInt(res[1].data.balance.amount);
-			})();
-		}
-	}
+	// 			mainAssetBalance = parseAssetInt(res[0].data.balance.amount);
+	// 			quoteAssetBalance = parseAssetInt(res[1].data.balance.amount);
+	// 		})();
+	// 	}
+	// }
 	$: {
 		if ($account.address) {
 			(async () => {
