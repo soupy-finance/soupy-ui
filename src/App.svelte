@@ -2,6 +2,7 @@
 	import axios from "axios";
 	import { Router, Route } from "svelte-navigator";
 	import * as noodleClient from "noodle-ts-client/dist";
+	import { chainInfo } from "./chainInfo";
 	import { assets } from "./assets";
 	import type { Markets } from "./markets";
 
@@ -37,22 +38,18 @@
 		// }
 
 		noodleClient.events.addEventsListener(
-			`tm.event='NewBlock' AND prices.data EXISTS`, 
+			`tm.event='NewBlock'`, 
 			(events, data) => {
-				let prices = JSON.parse(events.prices[0].data);
+				$chainInfo.chainId = data.value.block.header.chain_id;
+				$chainInfo.blockHeight = parseInt(data.value.block.header.height);	
 
-				// assets.update((assets) => {
-				// 	for (let assetKey in prices) {
-				// 		if (assets[assetKey]) {
-				// 			assets[assetKey].price = prices[assetKey];
-				// 		}
-				// 	}
-				// 	return assets;
-				// });
+				if (events.prices) {
+					let prices = JSON.parse(events.prices[0].data);
 
-				for (let assetKey in prices) {
-					if ($assets[assetKey]) {
-						$assets[assetKey].price = parseFloat(prices[assetKey]);
+					for (let assetKey in prices) {
+						if ($assets[assetKey]) {
+							$assets[assetKey].price = parseFloat(prices[assetKey]);
+						}
 					}
 				}
 			}

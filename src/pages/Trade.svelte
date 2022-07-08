@@ -61,27 +61,23 @@
 		if ($account.address) {
 			(async () => {
 				let res: any[] = await Promise.all([
-					noodleClient.modules.dex.query.queryOpenOrders($account.address),	
+					noodleClient.query.getOpenOrders($account.address),	
 					//axios.get(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`),
 				]);
-				let openOrdersJson = JSON.parse(res[2] || "{}");
 
-				for (let orderId in openOrdersJson) {
-					let order = openOrdersJson[orderId];
+				let newOpenOrders: any = JSON.parse(res[0].data.orders || "{}");
+				openOrders = Object.values(newOpenOrders).map((order: any) => ({
+					market: order.Market.toUpperCase(),
+					price: parseFloat(order.Price),
+					quantity: parseFloat(order.Quantity),
+					filled: parseFloat(order.Filled),
+					side: order.Side == "a",
+					date: parseInt(order.Date) * 1000,
+					mainAsset: order.Market.split("-")[0].toUpperCase(),
+					quoteAsset: order.Market.split("-")[1].toUpperCase(),
+				}));
 
-					openOrders.push({
-						market: order.Market,
-						price: order.Price,
-						quantity: order.Quantity,
-						filled: order.Filled,
-						side: order.Side == "a",
-						date: order.Date,
-						mainAsset: order.Market.split("-")[0].toUpperCase(),
-						quoteAsset: order.Market.split("-")[1].toUpperCase(),
-					});
-				}
-
-				// orderHistory = res[3];
+				// orderHistory = res[1];
 			})();
 		}
 	}
@@ -97,6 +93,10 @@
 		books = processBookUpdateQueue(books, booksUpdateQueue, booksBlockHeight);
 
 		// recentTrades = res[1];
+	}
+
+	function onDepositClick() {
+		axios.get(`${import.meta.env.VITE_FAUCET_ADDR}/deposit?address=${$account.address}`);
 	}
 
 	eventsHandlersIds.push(noodleClient.events.addEventsListener(
@@ -230,6 +230,9 @@
 					<div class="header">
 						Market	
 					</div>
+					<div class="header side">
+						Side	
+					</div>
 					<div class="header">
 						Price	
 					</div>
@@ -242,7 +245,7 @@
 					<div class="header">
 						Value	
 					</div>
-					<div class="header">
+					<div class="header date">
 						Date	
 					</div>
 				</div>
@@ -251,6 +254,9 @@
 						<div class="row">
 							<div class="col">
 								{order.market}	
+							</div>
+							<div class="col side {order.side ? "sell" : "buy"}">
+								{order.side ? "Sell" : "Buy"}
 							</div>
 							<div class="col">
 								{toPriceStr(order.price)} {order.quoteAsset} 
@@ -264,8 +270,11 @@
 							<div class="col">
 								{toQtyStr(order.price * order.quantity)} {quoteAsset} 
 							</div>
-							<div class="col">
-								{(new Date(Date.now())).toLocaleString()}
+							<div class="col date">
+								{(new Date(order.date)).toLocaleString()}
+							</div>
+							<div class="col cancel-btn">
+								Cancel
 							</div>
 						</div>	
 					{/each}
@@ -274,7 +283,7 @@
 		</div>
 		<div class="center-wrapper">
 			<OrderBook
-				price={marketInfo.price}
+				price={mainAssetPrice}
 				books={books}
 				mainAsset={mainAsset}
 				quoteAsset={quoteAsset} />
@@ -366,7 +375,9 @@
 					</div>
 				</div>
 				<div class="balance-btns">
-					<div class="balance-btn">
+					<div 
+						class="balance-btn"
+						on:click={onDepositClick}>
 						⭳ Deposit
 					</div>
 					<div class="balance-btn">
@@ -488,10 +499,6 @@
 		opacity: 0.6;
 	}
 
-	.orders-wrapper .header {
-		width: 8em;
-	}
-
 	.orders-wrapper .rows {
 		display: flex;
 		flex-flow: column nowrap;
@@ -509,10 +516,34 @@
 	}
 
 	.orders-wrapper .col {
-		width: 8em;
 		margin-top: 0.2em;
 
 		white-space: nowrap;
+	}
+
+	.orders-wrapper .col.buy {
+		color: #27ae60;
+	}
+
+	.orders-wrapper .col.sell {
+		color: #eb5757;
+	}
+
+	.orders-wrapper .header, .orders-wrapper .col {
+		width: 8em;
+	}
+
+	.header.side, .col.side {
+		width: 4em;
+	}
+
+	.header.date, .col.date {
+		width: 12em;
+	}
+
+	.cancel-btn {
+		opacity: 0.8;
+		cursor: pointer;
 	}
 
 	.market-info {

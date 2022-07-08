@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as noodleClient from "noodle-ts-client/dist";
 	import { account } from "../account";
+	import { notification } from "../notification";
 	import type { Market } from "../markets";
 
 	export let marketKey: string;
@@ -29,6 +30,10 @@
 
 	function sendOrder() {
 		noodleClient.tx.createOrder(marketKey, price, quantity, side, orderType);
+		notification.setNotification("Order sent", "Order has been sent to the network");
+
+		price = 0;
+		quantity = 0;
 	}
 </script>
 
@@ -66,7 +71,7 @@
 			maxlength="15"
 			bind:value={price} />
 		<div class="denom">
-			USDC
+			{quoteAsset}	
 		</div>
 	</div>
 	<div class="quantity input-wrapper">
@@ -78,7 +83,7 @@
 			maxlength="15"
 			bind:value={quantity} />
 		<div class="denom">
-			BTC
+			{mainAsset}	
 		</div>
 	</div>
 	<div class="total input-wrapper">
@@ -91,7 +96,7 @@
 			bind:value={orderValue}
 			disabled />
 		<div class="denom">
-			USDC	
+			{quoteAsset}
 		</div>
 	</div>
 	<div class="flags">
@@ -118,7 +123,7 @@
 		class="trade-btn theme-btn"
 		on:click={() => $account.wallet && sendOrder()}
 		disabled={!$account.wallet}>
-		Trade
+		{side ? "Sell" : "Buy"}	
 	</div>
 </div>
 

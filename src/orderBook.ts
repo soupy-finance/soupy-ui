@@ -138,7 +138,7 @@ export function addBookOrder(books: Books, id: string, price: number, quantity: 
 			total: quantity
 		};
 
-		if (price < levels[i].price == side)
+		if (levels.length == 0 || price < levels[i].price == side)
 			levels.splice(i, 0, level);
 		else
 			levels.splice(i + 1, 0, level);
@@ -190,6 +190,10 @@ export function updateLevelTotals(books: Books, side: boolean): Books {
 
 export function findPriceLevel(books: Books, price: number, side: boolean): [number, boolean] {
 	let levels = side == false ? books.bids : books.asks; 
+
+	if (levels.length == 0)
+		return [0, false];
+
 	let i = Math.floor(levels.length / 2);
 	let searchSize = levels.length;
 	let found = false;
