@@ -31,6 +31,7 @@ export interface ChartData {
 export type OpenOrders = OpenOrder[];
 
 export interface OpenOrder {
+	id: string;
 	market: string;
 	mainAsset: string;
 	quoteAsset: string;
@@ -53,4 +54,10 @@ export interface PastOrder {
 	side: boolean;
 	result: string;
 	date: number;
+}
+
+export function sortOpenOrders(openOrders: OpenOrders): OpenOrders {
+	return openOrders.sort((a, b) => {
+		return a.date - b.date;
+	});
 }

@@ -12,7 +12,7 @@
 		BookUpdate 
 	} from "../orderBook";
 	import { toPriceStr, toQtyStr, toPercentageStr, parseAssetInt } from "../number";
-	import type { Market, Markets, RecentTrades, OpenOrders, OrderHistory } from "../markets";
+	import { Market, Markets, RecentTrades, OpenOrders, OrderHistory, sortOpenOrders } from "../markets";
 	import { account } from "../account";
 	import { assets } from "../assets";
 	import { balances } from "../balances";
@@ -70,6 +70,7 @@
 
 				let newOpenOrders: any = JSON.parse(res[0].data.orders || "{}");
 				openOrders = Object.values(newOpenOrders).map((order: any) => ({
+					id: order.Id,
 					market: order.Market.toUpperCase(),
 					price: parseFloat(order.Price),
 					quantity: parseFloat(order.Quantity),
@@ -79,6 +80,7 @@
 					mainAsset: order.Market.split("-")[0].toUpperCase(),
 					quoteAsset: order.Market.split("-")[1].toUpperCase(),
 				}));
+				openOrders = sortOpenOrders(openOrders); 
 
 				// orderHistory = res[1];
 			})();
@@ -108,7 +110,7 @@
 			let blockHeight = parseInt(data.value.TxResult.height);
 
 			for (let order of events.add_offer) {
-				order = {
+				let update = {
 					blockHeight,
 					type: "add",
 					id: order.id,
@@ -118,9 +120,22 @@
 				};
 
 				if (booksBlockHeight == 0)
-					booksUpdateQueue.push(order);
+					booksUpdateQueue.push(update);
 				else
-					books = addBookOrder(books, order.id, order.price, order.quantity, order.side);
+					books = addBookOrder(books, update.id, update.price, update.quantity, update.side);
+
+				openOrders.push({
+					id: order.id,
+					market: order.market,
+					price: parseFloat(order.price),
+					quantity: parseFloat(order.quantity),
+					filled: 0,
+					side: order.side == "a",
+					date: blockHeight * 1000,
+					mainAsset: order.market.split("-")[0].toUpperCase(),
+					quoteAsset: order.market.split("-")[1].toUpperCase(),
+				});
+				openOrders = sortOpenOrders(openOrders);
 			}
 		}
 	));
@@ -142,6 +157,13 @@
 					booksUpdateQueue.push(order);
 				else
 					books = updateBookOrder(books, order.id, order.quantity);
+
+				openOrders = openOrders.map((_order: any) => {
+					if (_order.id == order.id)
+						return { ..._order, filled: order.quantity - _order.quantity };
+					else
+						return _order;
+				});
 			}
 		}
 	));
@@ -162,6 +184,8 @@
 					booksUpdateQueue.push(order);
 				else
 					books = removeBookOrder(books, order.id);
+
+				openOrders = openOrders.filter((_order: any) => _order.id != order.id);
 			}
 		}
 	));

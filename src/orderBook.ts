@@ -22,7 +22,6 @@ export interface BookUpdate {
 	type: string;
 	blockHeight: number;
 	id: string;
-	market: string;
 	quantity?: number;
 	price?: number;
 	side?: boolean;

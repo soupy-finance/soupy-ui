@@ -31,7 +31,6 @@
 	async function sendOrder() {
 		notification.setNotification("Order sent", "Order has been sent to the network");
 		let res = await noodleClient.tx.createOrder(marketKey, price, quantity, side, orderType);
-		console.log(res);
 
 		if (res.code == 0)
 			notification.setNotification("Order success", "Order executed successfully");
