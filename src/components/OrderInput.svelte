@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as noodleClient from "noodle-ts-client/dist";
+	import * as noodleClient from "@soupy-finance/noodle-ts-client";
 	import { assets } from "../assets";
 	import { account } from "../account";
 	import { notification } from "../notification";

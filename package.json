@@ -23,9 +23,9 @@
     "@solana/wallet-adapter-base": "^0.9.5",
     "@solana/wallet-adapter-wallets": "^0.16.1",
     "@solana/web3.js": "^1.43.5",
+    "@soupy-finance/noodle-ts-client": "^0.0.1",
     "@terra-money/terra.js": "^3.1.2",
     "axios": "^0.27.2",
-    "noodle-ts-client": "git+ssh://git@github.com-soupy:soupy-finance/noodle-ts-client.git",
     "svelte-navigator": "^3.1.6",
     "web3": "^1.7.3",
     "yrv": "^0.0.53"

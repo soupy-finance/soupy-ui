@@ -1,6 +1,6 @@
 import { writable, Writable } from "svelte/store";
 import { DirectSecp256k1HdWallet, AccountData } from "@cosmjs/proto-signing";
-import * as noodleClient from "noodle-ts-client/dist";
+import * as noodleClient from "@soupy-finance/noodle-ts-client";
 
 interface Account {
 	address?: string;

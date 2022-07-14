@@ -1,5 +1,5 @@
 import { derived, Readable } from "svelte/store";
-import * as noodleClient from "noodle-ts-client/dist";
+import * as noodleClient from "@soupy-finance/noodle-ts-client";
 import { account } from "./account";
 import { parseAssetInt, parseCoinStr } from "./number";
 

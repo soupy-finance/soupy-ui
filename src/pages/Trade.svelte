@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from "svelte";
 	import axios from "axios";
-	import * as noodleClient from "noodle-ts-client/dist";
+	import * as noodleClient from "@soupy-finance/noodle-ts-client";
 	import { 
 		parseBooksFromChainData, 
 		processBookUpdateQueue, 

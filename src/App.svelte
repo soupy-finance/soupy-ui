@@ -1,7 +1,7 @@
 <script lang="ts">
 	import axios from "axios";
 	import { Router, Route } from "svelte-navigator";
-	import * as noodleClient from "noodle-ts-client/dist";
+	import * as noodleClient from "@soupy-finance/noodle-ts-client";
 	import { chainInfo } from "./chainInfo";
 	import { assets } from "./assets";
 	import type { Markets } from "./markets";
