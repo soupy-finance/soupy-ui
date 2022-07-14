@@ -2,16 +2,10 @@
 	import TopBar from "../components/HomeTopBar.svelte";
 	import Footer from "../components/Footer.svelte";
 	import AssetLogo from "../components/AssetLogo.svelte";
-	import { assets } from "../assets";
+	import { assets } from "../stores";
 
 	let displayedAssets = ["eth", "atom", "sol", "avax", "luna", "bnb", "ftm"];
 </script>
-
-<svelte:head>
-	<title>
-		Soupy
-	</title>
-</svelte:head>
 
 <div class="wrapper">
 	<TopBar />
@@ -85,7 +79,7 @@
 						</div>
 						<div class="change">
 							<div class="percent">
-								0.0%
+								1.0%
 							</div>
 							<div class="time">
 								last 24h
@@ -141,11 +135,11 @@
 					<div class="details">
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Noodle testnet with swaps and spot trading
+							Litepaper publication
 						</div>
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							SOUP token ICO for audit and liquidity fundraising
+							Noodle devnet with spot trading
 						</div>
 					</div>
 				</div>
@@ -153,15 +147,11 @@
 					<div class="details">
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Noodle mainnet genesis with swaps and spot trading
+							Noodle testnet with swaps, spot trading, oAMMs, and cross-chain deposits/withdrawals 
 						</div>
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Bridging and cross-chain liquidity between Ethereum, Solana, Terra, Avalanche, BSC, and more
-						</div>
-						<div class="item">
-							<img src="/images/diamond.svg" width=14 />
-							SOUP token IDO on Soupy
+							SOUP token ICO
 						</div>
 					</div>
 					<div class="time">
@@ -177,11 +167,15 @@
 					<div class="details">
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Fiat on/offboarding
+							Noodle mainnet genesis
 						</div>
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Cross-chain perpetual futures
+							SOUP token IDO on the Soupy exchange
+						</div>
+						<div class="item">
+							<img src="/images/diamond.svg" width=14 />
+							Lending platform launch
 						</div>
 					</div>
 				</div>
@@ -189,11 +183,15 @@
 					<div class="details">
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Cross-chain token platform launch
+							Perpetual futures launch (crypto, commodities, and forex)
 						</div>
 						<div class="item">
 							<img src="/images/diamond.svg" width=14 />
-							Novel derivatives markets
+							Fiat on/offboarding launch
+						</div>
+						<div class="item">
+							<img src="/images/diamond.svg" width=14 />
+							Custom market and cross-chain token service launch
 						</div>
 					</div>
 					<div class="time">
@@ -387,7 +385,7 @@
 		padding: 1.3em;
 		border-radius: 1em;
 
-		background-color: var(--bg-color-sec);
+		background-color: #10162d;
 	}
 
 	.price-widget .top {
@@ -496,7 +494,7 @@
 
 		border-radius: 1em;
 
-		background-color: var(--bg-color-sec);
+		background-color: #10162d;
 	}
 
 	.section.e {
