@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as noodleClient from "noodle-ts-client/dist";
+	import { assets } from "../assets";
 	import { account } from "../account";
 	import { notification } from "../notification";
 	import type { Market } from "../markets";
@@ -26,19 +27,19 @@
 
 		if (quantity < 0)
 			quantity = 0;
+
+		if (orderType == noodleClient.types.OrderType.Market)
+			price = $assets[mainAsset.toLowerCase()].price; 
 	}
 
 	async function sendOrder() {
 		notification.setNotification("Order sent", "Order has been sent to the network");
 		let res = await noodleClient.tx.createOrder(marketKey, price, quantity, side, orderType);
 
-		if (res.code == 0)
-			notification.setNotification("Order success", "Order executed successfully");
-		else
-			notification.setNotification("Order failed", "Order failed to execute");
-
-		price = 0;
-		quantity = 0;
+		// if (res.code == 0)
+		// 	notification.setNotification("Order success", "Order executed successfully");
+		// else
+		// 	notification.setNotification("Order failed", "Order failed to execute");
 	}
 </script>
 
@@ -67,6 +68,7 @@
 			Sell	
 		</div>
 	</div>
+	{#if orderType == noodleClient.types.OrderType.Limit}
 	<div class="price input-wrapper">
 		<div class="label">
 			Price
@@ -79,6 +81,7 @@
 			{quoteAsset}	
 		</div>
 	</div>
+	{/if}
 	<div class="quantity input-wrapper">
 		<div class="label">
 			Amount	

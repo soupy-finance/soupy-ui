@@ -19,8 +19,8 @@ export type RecentTrades = RecentTrade[];
 
 export interface RecentTrade {
 	price: number;
-	size: number;
-	time: number;
+	quantity: number;
+	date: number;
 	sell: boolean;
 }
 
@@ -58,6 +58,12 @@ export interface PastOrder {
 
 export function sortOpenOrders(openOrders: OpenOrders): OpenOrders {
 	return openOrders.sort((a, b) => {
-		return a.date - b.date;
+		return b.date - a.date;
+	});
+}
+
+export function sortRecentTrades(recentTrades: RecentTrades): RecentTrades {
+	return recentTrades.sort((a, b) => {
+		return b.date - a.date;
 	});
 }

@@ -27,6 +27,19 @@ export interface BookUpdate {
 	side?: boolean;
 }
 
+export function updateBookMaxs(books: Books): Books {
+	let maxBidsTotal, maxAsksTotal: number = 0;
+
+	if (books.bids.length > 0)
+		maxBidsTotal = books.bids[books.bids.length - 1].total
+
+	if (books.asks.length > 0)
+		maxAsksTotal = books.asks[books.asks.length - 1].total
+
+	books.max = Math.max(maxBidsTotal, maxAsksTotal);
+	return books;
+}
+
 export function parseBooksFromChainData(data: { bids: string, asks: string }): Books {
 	let bids: any = JSON.parse(data.bids || "[]");
 	let asks: any = JSON.parse(data.asks || "[]");
@@ -51,7 +64,7 @@ export function parseBooksFromChainData(data: { bids: string, asks: string }): B
 		for (let order of level.Orders) {
 			let orderQuantity = parseFloat(order.Quantity);
 			quantity += orderQuantity;
-			books.orders[order.id] = {
+			books.orders[order.Id] = {
 				price,
 				quantity: orderQuantity,
 				level: uiLevel,
@@ -77,7 +90,7 @@ export function parseBooksFromChainData(data: { bids: string, asks: string }): B
 		for (let order of level.Orders) {
 			let orderQuantity = parseFloat(order.Quantity);
 			quantity += orderQuantity;
-			books.orders[order.id] = {
+			books.orders[order.Id] = {
 				price,
 				quantity: orderQuantity,
 				level: uiLevel,
@@ -91,15 +104,7 @@ export function parseBooksFromChainData(data: { bids: string, asks: string }): B
 		books.asks.push(uiLevel);
 	}
 
-	let maxBidsTotal, maxAsksTotal: number = 0;
-
-	if (books.bids.length > 0)
-		maxBidsTotal = books.bids[bids.length - 1].total
-
-	if (books.asks.length > 0)
-		maxAsksTotal = books.asks[asks.length - 1].total
-
-	books.max = Math.max(maxBidsTotal, maxAsksTotal);
+	books = updateBookMaxs(books);
 	return books;
 }
 
@@ -151,6 +156,7 @@ export function addBookOrder(books: Books, id: string, price: number, quantity: 
 	}; 
 
 	books = updateLevelTotals(books, side);
+	books = updateBookMaxs(books);
 	return books;
 }
 
@@ -158,12 +164,18 @@ export function updateBookOrder(books: Books, id: string, quantity: number): Boo
 	let order: BookOrder = books.orders[id];
 	order.level.quantity += quantity - order.quantity;
 	order.quantity = quantity;
+
 	books = updateLevelTotals(books, order.side);
+	books = updateBookMaxs(books);
 	return books;
 }
 
 export function removeBookOrder(books: Books, id: string): Books {
 	let order: BookOrder = books.orders[id];
+
+	if (order == null)
+		return books;
+	
 	let levels = order.side == false ? books.bids : books.asks; 
 	order.level.quantity -= order.quantity; 
 
@@ -171,6 +183,8 @@ export function removeBookOrder(books: Books, id: string): Books {
 		levels.splice(levels.indexOf(order.level), 1);	
 
 	books = updateLevelTotals(books, order.side);
+	books = updateBookMaxs(books);
+
 	delete books.orders[id];
 	return books;
 }

@@ -33,7 +33,7 @@
 		justify-content: flex-start;
 
 		position: fixed;
-		top: 2em;
+		bottom: 2em;
 		right: 2em;
 		width: 20em;
 
@@ -61,13 +61,13 @@
 	}
 
 	.title {
-		padding: 1em;
+		padding: 0.5em 1em;
 
 		white-space: nowrap;
 		font-weight: 700;
 	}
 
 	.content {
-		padding: 0.5em 1em;
+		padding: 0.5em 0.5em 0.5em 1em;
 	}
 </style>

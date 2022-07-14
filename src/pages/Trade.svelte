@@ -12,10 +12,11 @@
 		BookUpdate 
 	} from "../orderBook";
 	import { toPriceStr, toQtyStr, toPercentageStr, parseAssetInt } from "../number";
-	import { Market, Markets, RecentTrades, OpenOrders, OrderHistory, sortOpenOrders } from "../markets";
+	import { Market, Markets, RecentTrades, OpenOrders, OrderHistory, sortOpenOrders, sortRecentTrades } from "../markets";
 	import { account } from "../account";
 	import { assets } from "../assets";
 	import { balances } from "../balances";
+	import { notification } from "../notification";
 
 	import TopBar from "../components/AppTopBar.svelte";
 	import Chart from "../components/Chart.svelte";
@@ -69,8 +70,9 @@
 				]);
 
 				let newOpenOrders: any = JSON.parse(res[0].data.orders || "{}");
-				openOrders = Object.values(newOpenOrders).map((order: any) => ({
-					id: order.Id,
+				let orderIds: string[] = Object.keys(newOpenOrders);
+				newOpenOrders = Object.values(newOpenOrders).map((order: any, i: number) => ({
+					id: orderIds[i],
 					market: order.Market.toUpperCase(),
 					price: parseFloat(order.Price),
 					quantity: parseFloat(order.Quantity),
@@ -80,7 +82,7 @@
 					mainAsset: order.Market.split("-")[0].toUpperCase(),
 					quoteAsset: order.Market.split("-")[1].toUpperCase(),
 				}));
-				openOrders = sortOpenOrders(openOrders); 
+				openOrders = sortOpenOrders(newOpenOrders); 
 
 				// orderHistory = res[1];
 			})();
@@ -93,6 +95,7 @@
 			// axios.get(`${import.meta.env.VITE_API_REST_ADDR}/recentTrades/${marketKey}`),
 		]);
 
+		console.log(res[0].data);
 		books = parseBooksFromChainData(res[0].data);
 		booksBlockHeight = parseInt(res[0].headers.get("Grpc-Metadata-X-Cosmos-Block-Height"));
 		books = processBookUpdateQueue(books, booksUpdateQueue, booksBlockHeight);
@@ -101,7 +104,14 @@
 	}
 
 	function onDepositClick() {
+		notification.setNotification("Deposit sent", "Simulating deposit...");
 		axios.get(`${import.meta.env.VITE_FAUCET_ADDR}/deposit?address=${$account.address}`);
+	}
+
+	async function cancelOrder(market: string, side: boolean, price: number, id: string) {
+		notification.setNotification("Cancelling order", "Order cancelation been sent to the network");
+		let res = await noodleClient.tx.cancelOrder(market, side, price, id);
+		console.log(res);
 	}
 
 	eventsHandlersIds.push(noodleClient.events.addEventsListener(
@@ -113,7 +123,7 @@
 				let update = {
 					blockHeight,
 					type: "add",
-					id: order.id,
+					id: order.order_id,
 					quantity: parseFloat(order.quantity),
 					price: parseFloat(order.price),
 					side: order.side == "a",
@@ -125,7 +135,7 @@
 					books = addBookOrder(books, update.id, update.price, update.quantity, update.side);
 
 				openOrders.push({
-					id: order.id,
+					id: order.order_id,
 					market: order.market,
 					price: parseFloat(order.price),
 					quantity: parseFloat(order.quantity),
@@ -135,8 +145,9 @@
 					mainAsset: order.market.split("-")[0].toUpperCase(),
 					quoteAsset: order.market.split("-")[1].toUpperCase(),
 				});
-				openOrders = sortOpenOrders(openOrders);
 			}
+
+			openOrders = sortOpenOrders(openOrders);
 		}
 	));
 
@@ -149,7 +160,7 @@
 				order = {
 					blockHeight,
 					type: "update",
-					id: order.id,
+					id: order.order_id,
 					quantity: parseFloat(order.quantity),
 				};
 
@@ -177,7 +188,7 @@
 				order = {
 					blockHeight,
 					type: "remove",
-					id: order.id,
+					id: order.order_id,
 				};
 
 				if (booksBlockHeight == 0)
@@ -187,6 +198,22 @@
 
 				openOrders = openOrders.filter((_order: any) => _order.id != order.id);
 			}
+		}
+	));
+
+	eventsHandlersIds.push(noodleClient.events.addEventsListener(
+		`tm.event='Tx' AND trade_exec.market EXISTS AND trade_exec.market='${marketKey}'`, 
+		(events, data) => {
+			for (let trade of events.trade_exec) {
+				recentTrades.push({
+					price: parseFloat(trade.price),
+					quantity: parseFloat(trade.quantity),
+					sell: trade.side == "a",
+					date: Date.now(),
+				});
+			}
+
+			recentTrades = sortRecentTrades(recentTrades);
 		}
 	));
 
@@ -300,7 +327,9 @@
 							<div class="col date">
 								{(new Date(order.date)).toLocaleString()}
 							</div>
-							<div class="col cancel-btn">
+							<div 
+								class="col cancel-btn"
+								on:click={() => cancelOrder(order.market.toLowerCase(), order.side, order.price, order.id)}>
 								Cancel
 							</div>
 						</div>	
@@ -336,10 +365,10 @@
 								{toPriceStr(trade.price)}
 							</div>
 							<div class="size">
-								{toQtyStr(trade.size)}
+								{toQtyStr(trade.quantity)}
 							</div>
 							<div class="time">
-								{(new Date(trade.time)).toLocaleTimeString("it-IT")}
+								{(new Date(trade.date)).toLocaleTimeString("it-IT")}
 							</div>
 						</div>
 					{/each}
@@ -407,7 +436,7 @@
 						on:click={onDepositClick}>
 						⭳ Deposit
 					</div>
-					<div class="balance-btn">
+					<div class="balance-btn" disabled>
 						⭱ Withdraw 
 					</div>
 				</div>
@@ -419,6 +448,7 @@
 </div>
 
 <style>
+
 	.wrapper {
 		flex-grow: 1;
 
@@ -722,5 +752,10 @@
 
 		background-color: var(--bg-color-third);
 		cursor: pointer;
+	}
+
+	.balance-btn[disabled] {
+		opacity: 0.6 !important;
+		cursor: default !important;
 	}
 </style>

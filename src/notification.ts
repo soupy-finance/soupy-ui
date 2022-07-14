@@ -15,18 +15,19 @@ export interface Notification {
 
 export type Notifications = Notification[];
 
-const DEFAULT_DURATION: number = 5e3;
+const DEFAULT_DURATION: number = 3e3;
 const { subscribe, set, update }: Writable<Notification> = writable({}, () => () => clearTimeout(timeout));
 var timeout: NodeJS.Timeout;
 
-function setNotification(title: string, content: string, type: NotifType=NotifType.Error, duration: number=DEFAULT_DURATION) {
-	set({ title, content, type });
+function setNotification(title: string, content: string, type: NotifType=NotifType.Neutral, duration: number=DEFAULT_DURATION) {
+	clearTimeout(timeout);
 	timeout = setTimeout(() => clearNotification(), duration);
+	set({ title, content, type });
 }
 
 function clearNotification() {
-	set({});
 	clearTimeout(timeout);
+	set({});
 }
 
 export const notification = {
