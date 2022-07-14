@@ -9,8 +9,17 @@ import {
 	SolletWalletAdapter,
 	TorusWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import type { TransactionSignature } from "@solana/web3.js";
-import type { WalletStore } from "./types";
+import type { PublicKey, TransactionSignature } from "@solana/web3.js";
+import type { Adapter, WalletReadyState } from "@solana/wallet-adapter-base";
+
+export interface WalletStore {
+	all: Adapter[];
+	active: Adapter | null;
+	publicKey: PublicKey | null;	
+	connected: boolean;	
+	connecting: boolean;
+	disconnecting: boolean;
+}
 
 const { subscribe, update } = writable<WalletStore>({
 	all: [], 
@@ -20,6 +29,7 @@ const { subscribe, update } = writable<WalletStore>({
 	connecting: false,
 	disconnecting: false
 });
+
 const walletStore = {
 	subscribe,
 	select,

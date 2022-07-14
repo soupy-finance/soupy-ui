@@ -2,10 +2,16 @@
 	import TopBar from "../components/HomeTopBar.svelte";
 	import Footer from "../components/Footer.svelte";
 	import AssetLogo from "../components/AssetLogo.svelte";
-	import { assets } from "../stores";
+	import { assets } from "../assets";
 
 	let displayedAssets = ["eth", "atom", "sol", "avax", "luna", "bnb", "ftm"];
 </script>
+
+<svelte:head>
+	<title>
+		Soupy
+	</title>
+</svelte:head>
 
 <div class="wrapper">
 	<TopBar />
@@ -79,7 +85,7 @@
 						</div>
 						<div class="change">
 							<div class="percent">
-								1.0%
+								0.0%
 							</div>
 							<div class="time">
 								last 24h
@@ -381,7 +387,7 @@
 		padding: 1.3em;
 		border-radius: 1em;
 
-		background-color: #10162d;
+		background-color: var(--bg-color-sec);
 	}
 
 	.price-widget .top {
@@ -490,7 +496,7 @@
 
 		border-radius: 1em;
 
-		background-color: #10162d;
+		background-color: var(--bg-color-sec);
 	}
 
 	.section.e {

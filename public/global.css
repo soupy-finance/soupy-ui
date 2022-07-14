@@ -18,3 +18,15 @@ a {
 	color: white;
 	text-decoration: none;
 }
+
+.theme-btn {
+	background: rgb(229,0,0);
+	background: linear-gradient(90deg, rgba(229,0,0,1) 0%, rgba(229,110,0,1) 100%);	
+	box-shadow: 0px 0px 3px 0.1px black; 
+	color: white;
+	cursor: pointer;
+}
+
+h1, h2, h3, h4 {
+	outline: none;
+}

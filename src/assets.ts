@@ -1,5 +1,13 @@
 import { writable, Writable } from "svelte/store";
-import type { Asset, Web3 } from "./types";
+
+export interface Asset {
+	name: string;
+	symbol: string;
+	price: number;
+	balance: number;
+	cmcId: number;
+	color: string;
+}
 
 export const assets: Writable<{[key: string]: Asset}> = writable({
 	"usdc": {
@@ -9,14 +17,6 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 		balance: 0,
 		cmcId: 3408,
 		color: "#2775ca"
-	},
-	"ust": {
-		name: "Terra USD",
-		symbol: "UST",
-		price: 1,
-		balance: 0,
-		cmcId: 7129,
-		color: "#5493f7"
 	},
 	"usdt": {
 		name: "Tether",
@@ -29,7 +29,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"wbtc": {
 		name: "Wrapped Bitcoin",
 		symbol: "WBTC",
-		price: 41000,
+		price: 0,
 		balance: 0,
 		cmcId: 1,
 		color: "#f7931a"
@@ -37,7 +37,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"eth": {
 		name: "Ether",
 		symbol: "ETH",
-		price: 4100,
+		price: 0,
 		balance: 0,
 		cmcId: 1027,
 		color: "#797f9f"
@@ -45,7 +45,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"atom": {
 		name: "Cosmos Hub",
 		symbol: "ATOM",
-		price: 25,
+		price: 0,
 		balance: 0,
 		cmcId: 3794,
 		color: "#2e3148"
@@ -53,7 +53,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"sol": {
 		name: "Solana",
 		symbol: "SOL",
-		price: 100,
+		price: 0,
 		balance: 0,
 		cmcId: 5426,
 		color: "#667ee0"
@@ -61,7 +61,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"avax": {
 		name: "Avalanche",
 		symbol: "AVAX",
-		price: 80,
+		price: 0,
 		balance: 0,
 		cmcId: 5805,
 		color: "#e84142"
@@ -69,15 +69,15 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"luna": {
 		name: "Terra",
 		symbol: "LUNA",
-		price: 90,
+		price: 0,
 		balance: 0,
-		cmcId: 4172,
+		cmcId: 20314,
 		color: "#172852"
 	},
 	"bnb": {
 		name: "BNB",
 		symbol: "BNB",
-		price: 400,
+		price: 0,
 		balance: 0,
 		cmcId: 1839,
 		color: "#bd9108"
@@ -85,7 +85,7 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"ftm": {
 		name: "Fantom",
 		symbol: "FTM",
-		price: 2,
+		price: 0,
 		balance: 0,
 		cmcId: 3513,
 		color: "#1969ff"
@@ -93,14 +93,9 @@ export const assets: Writable<{[key: string]: Asset}> = writable({
 	"matic": {
 		name: "Polygon",
 		symbol: "MATIC",
-		price: 2,
+		price: 0,
 		balance: 0,
 		cmcId: 3890,
 		color: "#8247e5"
 	},
-});
-export const web3: Writable<Web3> = writable({
-	evm : {},
-	solana: {},
-	terra: {}
 });
