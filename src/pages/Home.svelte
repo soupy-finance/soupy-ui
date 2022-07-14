@@ -2,7 +2,7 @@
 	import TopBar from "../components/HomeTopBar.svelte";
 	import Footer from "../components/Footer.svelte";
 	import AssetLogo from "../components/AssetLogo.svelte";
-	import { assets } from "../stores";
+	import { assets } from "../assets";
 
 	let displayedAssets = ["eth", "atom", "sol", "avax", "luna", "bnb", "ftm"];
 </script>
