@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onDestroy } from "svelte";
-	import axios from "axios";
 	import * as noodleClient from "@soupy-finance/noodle-ts-client";
 	import { 
 		parseBooksFromChainData, 
@@ -66,7 +65,7 @@
 			(async () => {
 				let res: any[] = await Promise.all([
 					noodleClient.query.getOpenOrders($account.address),	
-					//axios.get(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`),
+					//fetch(`${import.meta.env.VITE_API_REST_ADDR}/orderHistory/${$account.address}`, { mode: "no-cors" }),
 				]);
 
 				let newOpenOrders: any = JSON.parse(res[0].data.orders || "{}");
@@ -92,7 +91,7 @@
 	async function loadData() {
 		let res: any[] = await Promise.all([
 			noodleClient.query.getBooks(marketKey),
-			// axios.get(`${import.meta.env.VITE_API_REST_ADDR}/recentTrades/${marketKey}`),
+			// fetch(`${import.meta.env.VITE_API_REST_ADDR}/recentTrades/${marketKey}`, { mode: "no-cors" }),
 		]);
 
 		console.log(res[0].data);
@@ -105,7 +104,7 @@
 
 	function onDepositClick() {
 		notification.setNotification("Deposit sent", "Simulating deposit...");
-		axios.get(`${import.meta.env.VITE_FAUCET_ADDR}/deposit?address=${$account.address}`);
+		fetch(`${import.meta.env.VITE_FAUCET_ADDR}/deposit?address=${$account.address}`, { mode: "no-cors" });
 	}
 
 	async function cancelOrder(market: string, side: boolean, price: number, id: string) {

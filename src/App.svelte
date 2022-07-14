@@ -1,5 +1,4 @@
 <script lang="ts">
-	import axios from "axios";
 	import { Router, Route } from "svelte-navigator";
 	import * as noodleClient from "@soupy-finance/noodle-ts-client";
 	import { chainInfo } from "./chainInfo";
@@ -26,7 +25,7 @@
 		let res: any = await noodleClient.query.getDexParams();
 		markets = JSON.parse(res.data.params.markets);
 
-		// let apiMarketData: Markets = await axios.get(`${import.meta.env.VITE_API_REST_ADDR}/markets`);
+		// let apiMarketData: Markets = await fetch(`${import.meta.env.VITE_API_REST_ADDR}/markets`, { mode: "no-cors" });
 
 		// for (let marketKey in apiMarketData) {
 		// 	if (markets[marketKey]) {
