@@ -133,17 +133,19 @@
 				else
 					books = addBookOrder(books, update.id, update.price, update.quantity, update.side);
 
-				openOrders.push({
-					id: order.order_id,
-					market: order.market,
-					price: parseFloat(order.price),
-					quantity: parseFloat(order.quantity),
-					filled: 0,
-					side: order.side == "a",
-					date: blockHeight * 1000,
-					mainAsset: order.market.split("-")[0].toUpperCase(),
-					quoteAsset: order.market.split("-")[1].toUpperCase(),
-				});
+				if (order.account == $account.address) {
+					openOrders.push({
+						id: order.order_id,
+						market: order.market,
+						price: parseFloat(order.price),
+						quantity: parseFloat(order.quantity),
+						filled: 0,
+						side: order.side == "a",
+						date: blockHeight * 1000,
+						mainAsset: order.market.split("-")[0].toUpperCase(),
+						quoteAsset: order.market.split("-")[1].toUpperCase(),
+					});
+				}
 			}
 
 			openOrders = sortOpenOrders(openOrders);
