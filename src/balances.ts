@@ -66,11 +66,11 @@ export const balances: Readable<{[key: string]: number}> = derived(account, ($ac
 		);
 	}
 
-	return () => {
-		if (receivedHandlerId)
-			noodleClient.events.removeEventsListener(receivedHandlerId);
+	// return () => {
+	// 	if (receivedHandlerId)
+	// 		noodleClient.events.removeEventsListener(receivedHandlerId);
 
-		if (spentHandlerId)
-			noodleClient.events.removeEventsListener(spentHandlerId);
-	}
+	// 	if (spentHandlerId)
+	// 		noodleClient.events.removeEventsListener(spentHandlerId);
+	// }
 }, balancesObj);
